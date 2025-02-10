@@ -1,10 +1,26 @@
-import create, { StateCreator } from "zustand";
-import { persist, createJSONStorage } from "zustand/middleware";
-import { storage } from "@/lib/storage";
-import { Session } from "@supabase/supabase-js";
+import {create} from 'zustand'
+import { persist } from 'zustand/middleware'
+import { zustandStorage } from '@/lib/storage'
+import { AuthError, Provider, Session } from '@supabase/supabase-js'
+import { supabase } from '@/lib/supabase-client'
 
 interface AuthState {
-  session: Session | null;
-  setSession: (session: Session | null) => void;
-  clearSession: () => void;
+    session: Session | null;
+    isLoading: boolean;
+    error: AuthError | null;
+
+    setSession: (session: Session) => void;
+    clearSession: () => void;
+
+    signIn: (email: string, password: string) => Promise<void>;
+    signUp: (email: string, password: string) => Promise<void>;
+
+    signInWithProvider: (provider: Provider) => Promise<void>;
+
+    signOut: () => Promise<void>;
+
+    setError: (error: AuthError | null) => void;
+    clearError: () => void;
+
 }
+
