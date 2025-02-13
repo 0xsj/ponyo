@@ -11,7 +11,6 @@ import { useEffect } from "react";
 import "react-native-reanimated";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { loadSession } from "@/lib/supabase-client";
 
 SplashScreen.preventAutoHideAsync();
 
@@ -35,7 +34,6 @@ export default function RootLayout() {
   useEffect(() => {
     if (loaded) {
       console.log("AppLoaded");
-      loadSession();
       SplashScreen.hideAsync();
     }
   }, [loaded]);
