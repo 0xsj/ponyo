@@ -1,1 +1,1 @@
-import { supabase } from "@/lib/supabase-client";
+import { supabase } from "@/lib/client/supabase-client";
