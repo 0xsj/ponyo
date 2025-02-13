@@ -1,21 +1,34 @@
 import { MMKV } from "react-native-mmkv";
-import { StorageAdapter } from "./types";
+import { IAuthStorage } from "../auth/providers/types";
 
 const storage = new MMKV();
 
-export const MMKVStorageAdapter: StorageAdapter = {
-  getItem: async (key: string) => {
-    const value = storage.getString(key);
-    return Promise.resolve(value ?? null);
-  },
+export class MMKVStorageAdapter implements IAuthStorage {
+  async getItem(key: string): Promise<string | null> {
+    try {
+      const value = storage.getString(key);
+      return value ?? null;
+    } catch (error) {
+      console.error("MMKV getItem error:", error);
+      return null;
+    }
+  }
 
-  setItem: async (key: string, value: string) => {
-    storage.set(key, value);
-    return Promise.resolve();
-  },
+  async setItem(key: string, value: string): Promise<void> {
+    try {
+      storage.set(key, value);
+    } catch (error) {
+      console.error("MMKV setItem error:", error);
+      throw error;
+    }
+  }
 
-  removeItem: async (key: string) => {
-    storage.delete(key);
-    return Promise.resolve();
-  },
-};
+  async removeItem(key: string): Promise<void> {
+    try {
+      storage.delete(key);
+    } catch (error) {
+      console.error("MMKV removeItem error:", error);
+      throw error;
+    }
+  }
+}

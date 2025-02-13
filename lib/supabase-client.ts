@@ -16,25 +16,3 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
     detectSessionInUrl: false,
   },
 });
-
-export async function loadSession() {
-  try {
-    const session = await storageAdapter.getItem("supabase.auth.token");
-    console.log("Session check:", session ? "Found" : "Not found");
-
-    if (!session) {
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email: "example@gmail.com",
-        password: "Test123$",
-      });
-
-      if (error) {
-        console.error("Sign-in failed:", error.message);
-      } else {
-        console.log("Sign-in successful:", data);
-      }
-    }
-  } catch (error) {
-    console.error("Error loading session:", error);
-  }
-}

@@ -2,17 +2,9 @@ import { storageAdapter } from "./index";
 import { StateStorage } from "zustand/middleware";
 
 export const zustandStorage: StateStorage = {
-  setItem: (name, value) => {
-    return storageAdapter.setItem(name, value);
-  },
-
-  getItem: (name) => {
-    return storageAdapter.getItem(name);
-  },
-
-  removeItem: (name) => {
-    return storageAdapter.removeItem(name);
-  },
+  setItem: (name, value) => storageAdapter.setItem(name, value),
+  getItem: (name) => storageAdapter.getItem(name),
+  removeItem: (name) => storageAdapter.removeItem(name),
 };
 
 export const storageHelper = {
@@ -23,7 +15,6 @@ export const storageHelper = {
       await storageAdapter.setItem(key, JSON.stringify(value));
     }
   },
-
   get: async <T>(key: string): Promise<T | null> => {
     const value = await storageAdapter.getItem(key);
     if (!value) return null;
@@ -33,10 +24,7 @@ export const storageHelper = {
       return value as T;
     }
   },
-
-  delete: (key: string) => {
-    return storageAdapter.removeItem(key);
-  },
-
-  clearAll: async () => {},
+  delete: (key: string) => storageAdapter.removeItem(key),
+  // clearAll: async () => {
+  // },
 };
