@@ -1,8 +1,8 @@
 import { createClient } from "@supabase/supabase-js";
 import { storageAdapter } from "./storage";
 
-const supabaseUrl = process.env.EXPO_SUPABASE_URL 
-const supabaseAnonKey = process.env.EXPO_SUPABASE_ANON_KEY
+const supabaseUrl = process.env.EXPO_PUBLIC_SUPABASE_URL;
+const supabaseAnonKey = process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY;
 
 if (!supabaseUrl || !supabaseAnonKey) {
   throw new Error("Supabase URL and anon key must be defined in .env");
@@ -20,23 +20,21 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
 export async function loadSession() {
   try {
     const session = await storageAdapter.getItem("supabase.auth.token");
-    console.log('Session check:', session ? 'Found' : 'Not found');
+    console.log("Session check:", session ? "Found" : "Not found");
 
-    if(!session) {
-      const {data, error} = await supabase.auth.signInWithPassword({
+    if (!session) {
+      const { data, error } = await supabase.auth.signInWithPassword({
         email: "example@gmail.com",
-        password: "Test123$"
-      })
+        password: "Test123$",
+      });
 
-      if(error) {
+      if (error) {
         console.error("Sign-in failed:", error.message);
       } else {
-        console.log("Sign-in successful:", data)
+        console.log("Sign-in successful:", data);
       }
     }
-
-
   } catch (error) {
-    console.error('Error loading session:', error);
+    console.error("Error loading session:", error);
   }
 }
