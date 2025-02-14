@@ -16,5 +16,5 @@ export interface AuthEventPayload {
 }
 
 export interface IAuthEvents {
-  onAuthStateChange(callback: (payload: AuthEventPayload) => void): () => void;
+  onAuthStateChange?(callback: (payload: AuthEventPayload) => void): () => void;
 }

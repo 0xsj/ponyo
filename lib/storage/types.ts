@@ -1,2 +1,2 @@
-import { IAuthStorage } from "../auth/providers/types";
+import { IAuthStorage } from "../core";
 export type StorageAdapter = IAuthStorage;
