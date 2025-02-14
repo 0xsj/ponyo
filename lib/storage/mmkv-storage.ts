@@ -1,5 +1,5 @@
 import { MMKV } from "react-native-mmkv";
-import { IAuthStorage } from "../auth/providers/types";
+import { IAuthStorage } from "../core";
 
 const storage = new MMKV();
 

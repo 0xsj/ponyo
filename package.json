@@ -11,7 +11,7 @@
     "web": "expo start --web",
     "test": "jest --watchAll",
     "lint": "expo lint",
-    "codegen": "supabase gen types typescript --project-id sehjszlahxdojddvgekn > types/database.types.ts",
+    "codegen": "supabase gen types typescript --project-id sehjszlahxdojddvgekn > lib/supabase/database.types.ts",
     "format": "prettier --write \"**/*.{ts,tsx}\""
   },
   "jest": {

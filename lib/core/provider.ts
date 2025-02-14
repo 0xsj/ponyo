@@ -7,7 +7,7 @@ import type { IAuthEvents } from "./events";
 export interface IAuthProvider
   extends IAuthCore,
     IAuthSession,
-    IAuthOAuth,
+    // IAuthOAuth,
     IAuthEvents {
   initialize(): Promise<void>;
 
@@ -17,8 +17,8 @@ export interface IAuthProvider
   resetPassword(email: string): Promise<AuthResult<void>>;
   updatePassword(newPassword: string): Promise<AuthResult<void>>;
 
-  sendVerificationEmail(email: string): Promise<AuthResult<void>>;
-  verifyEmail(token: string): Promise<AuthResult<void>>;
+  sendVerificationEmail?(email: string): Promise<AuthResult<void>>;
+  verifyEmail?(token: string): Promise<AuthResult<void>>;
 
   setupMFA?(): Promise<AuthResult<void>>;
   verifyMFA?(code: string): Promise<AuthResult<void>>;

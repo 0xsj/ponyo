@@ -1,5 +1,5 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { IAuthStorage } from "../auth/providers/types";
+import { IAuthStorage } from "../core";
 
 export class AsyncStorageAdapter implements IAuthStorage {
   async getItem(key: string): Promise<string | null> {
