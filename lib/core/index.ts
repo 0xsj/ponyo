@@ -4,5 +4,4 @@ export * from "./session";
 export * from "./oauth";
 export * from "./events";
 export * from "./storage";
-export * from "./factory";
 export * from "./provider";
