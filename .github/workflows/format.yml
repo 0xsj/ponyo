@@ -28,8 +28,8 @@ jobs:
       - name: Run Prettier
         run: yarn format
         
-      - name: Generate Supabase Types 
-        run: yarn codegen
+      # - name: Generate Supabase Types 
+      #   run: yarn codegen
         
       - name: Commit changes
         uses: stefanzweifel/git-auto-commit-action@v5
