@@ -10,12 +10,14 @@ import { useState } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { useAuthStore } from "@/store/auth.store";
 import { useDebugStorage } from "@/hooks/useDebugStore";
+import { useUser } from "@/hooks/useUser";
 
 export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const { signIn, isLoading } = useAuth();
   const store = useAuthStore();
+  
   useDebugStorage();
 
   const handleLogin = async () => {
