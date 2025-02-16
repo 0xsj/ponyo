@@ -12,7 +12,14 @@ export class SupabaseMapper {
       id: supabaseUser.id,
       email: supabaseUser.email ?? "",
       emailVerified: supabaseUser.email_confirmed_at !== null,
-      metadata: supabaseUser.user_metadata,
+      metadata: {
+        ...supabaseUser.user_metadata,
+        providers:
+          supabaseUser.identities?.map((identity) => identity.provider) ?? [],
+        appMetadata: supabaseUser.app_metadata,
+        createdAt: supabaseUser.created_at,
+        updatedAt: supabaseUser.updated_at,
+      },
     };
   }
 
@@ -20,6 +27,7 @@ export class SupabaseMapper {
     supabaseSession: SupabaseSession | null,
   ): AuthSession | null {
     if (!supabaseSession) return null;
+
     return {
       user: this.toAuthUser(supabaseSession.user),
       accessToken: supabaseSession.access_token,
