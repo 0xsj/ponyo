@@ -10,5 +10,6 @@ export const useAuth = () => {
     signIn: store.signIn,
     signUp: store.signUp,
     signOut: store.signOut,
+    signInWithProvider: store.signInWithProvider,
   };
 };
