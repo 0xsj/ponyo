@@ -1,4 +1,4 @@
-import { createClient } from "@supabase/supabase-js";
+import { createClient, SupabaseClient } from "@supabase/supabase-js";
 import { storageAdapter } from "../../storage";
 import type { Database } from "../database.types";
 
@@ -18,4 +18,4 @@ export const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey, {
   },
 });
 
-export type SupbaseClient = typeof supabase;
+export type TypedSupabaseClient = SupabaseClient<Database>;
