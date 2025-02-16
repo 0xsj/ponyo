@@ -7,7 +7,7 @@ import type { IAuthEvents } from "./events";
 export interface IAuthProvider
   extends IAuthCore,
     IAuthSession,
-    // IAuthOAuth,
+    IAuthOAuth,
     IAuthEvents {
   initialize(): Promise<void>;
 

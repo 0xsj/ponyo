@@ -15,8 +15,10 @@ export interface OAuthCredentials {
 }
 
 export interface IAuthOAuth {
-  signInWithProvider(provider: OAuthProvider): Promise<AuthResult<AuthSession>>;
-  linkProvider(provider: OAuthProvider): Promise<AuthResult<void>>;
-  unlinkProvider(provider: OAuthProvider): Promise<AuthResult<void>>;
-  getLinkedProviders(): Promise<AuthResult<OAuthProvider[]>>;
+  signInWithProvider?(
+    provider: OAuthProvider,
+  ): Promise<AuthResult<AuthSession>>;
+  linkProvider?(provider: OAuthProvider): Promise<AuthResult<void>>;
+  unlinkProvider?(provider: OAuthProvider): Promise<AuthResult<void>>;
+  getLinkedProviders?(): Promise<AuthResult<OAuthProvider[]>>;
 }
