@@ -1,59 +1,57 @@
-// /lib/shared/result.ts
-import { APIError } from "../errors/api-error";
-
 export class Result<T, E extends Error = Error> {
   private constructor(
+    private readonly ok: boolean,
     private readonly value: T | null,
     private readonly error: E | null,
   ) {}
 
-  static ok<T>(value: T): Result<T> {
-    return new Result(value, null);
+  static Ok<T, E extends Error>(value: T): Result<T, E> {
+    return new Result<T, E>(true, value, null);
   }
 
-  static fail<E extends Error>(error: E): Result<never, E> {
-    return new Result<never, E>(null as never, error);
+  static Err<T, E extends Error>(error: E): Result<T, E> {
+    return new Result<T, E>(false, null, error);
   }
 
-  isOk(): boolean {
-    return this.error === null;
+  isOk(): this is Result<T, never> {
+    return this.ok;
   }
 
-  isFail(): boolean {
-    return this.error !== null;
+  isErr(): this is Result<never, E> {
+    return !this.ok;
   }
 
-  getValue(): T {
-    if (this.value === null) {
-      throw new Error("Cannot get value from a failed result");
+  unwrap(): T {
+    if (!this.ok) {
+      throw new Error("Called unwrap on an Err value");
     }
-    return this.value;
+    return this.value!;
   }
 
-  getError(): E {
-    if (this.error === null) {
-      throw new Error("Cannot get error from a successful result");
+  unwrapErr(): E {
+    if (this.ok) {
+      throw new Error("Called unwrapErr on an Ok value");
     }
-    return this.error;
+    return this.error!;
   }
 
-  // Fixed map method preserving the error type
+  unwrapOr(defaultValue: T): T {
+    return this.ok ? this.value! : defaultValue;
+  }
+
   map<U>(fn: (value: T) => U): Result<U, E> {
-    if (this.isOk()) {
-      return Result.ok(fn(this.getValue())) as Result<U, E>;
-    }
-    return Result.fail(this.getError());
+    return this.ok ? Result.Ok(fn(this.value!)) : Result.Err(this.error!);
   }
 
-  match<U>(options: { ok: (value: T) => U; fail: (error: E) => U }): U {
-    return this.isOk()
-      ? options.ok(this.getValue())
-      : options.fail(this.getError());
+  mapErr<F extends Error>(fn: (error: E) => F): Result<T, F> {
+    return this.ok ? Result.Ok(this.value!) : Result.Err(fn(this.error!));
   }
 
   andThen<U>(fn: (value: T) => Result<U, E>): Result<U, E> {
-    return this.isOk() ? fn(this.getValue()) : Result.fail(this.getError());
+    return this.ok ? fn(this.value!) : Result.Err(this.error!);
+  }
+
+  match<U>(options: { Ok: (value: T) => U; Err: (error: E) => U }): U {
+    return this.ok ? options.Ok(this.value!) : options.Err(this.error!);
   }
 }
-
-export type APIResult<T> = Result<T, APIError>;
