@@ -1,0 +1,45 @@
+import { APIError } from "@/lib/errors/api-error";
+import { TypedSupabaseClient } from "../../client/supabase-client";
+import { IUser } from "@/lib/interfaces";
+import { User } from "@/lib/models";
+import { Result } from "@/lib/shared/result";
+import { UserRow } from "./user.types";
+import {
+  RepositoryError,
+  RepositoryErrorCode,
+} from "@/lib/errors/repository-error";
+
+export class UserAPI implements IUser {
+  constructor(private readonly supabase: TypedSupabaseClient) {}
+
+  async get(id: string): Promise<Result<User, RepositoryError>> {
+    const { data, error } = await this.supabase
+      .from("users")
+      .select("*")
+      .eq("id", id)
+      .single();
+
+    if (error)
+      return Result.Err(RepositoryError.fromPostgresError(error, "User"));
+    if (!data)
+      return Result.Err(
+        new RepositoryError(
+          RepositoryErrorCode.NotFound,
+          `User ${id} not found`,
+        ),
+      );
+
+    return Result.Ok(this.toUser(data));
+  }
+
+  private toUser(row: UserRow): User {
+    return {
+      id: row.id,
+      email: row.email,
+      username: row.username,
+      isActive: row.is_active ?? false,
+      createdAt: row.created_at,
+      updatedAt: row.updated_at,
+    };
+  }
+}

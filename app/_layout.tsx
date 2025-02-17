@@ -32,7 +32,6 @@ export default function RootLayout() {
   const { isAuthenticated, isLoading: authLoading } = useAuth();
   const segments = useSegments();
   const router = useRouter();
-  const { users } = useUser();
   const [loaded] = useFonts({
     SpaceMono: require("../assets/fonts/SpaceMono-Regular.ttf"),
   });
@@ -42,7 +41,7 @@ export default function RootLayout() {
       console.log("AppLoaded");
       SplashScreen.hideAsync();
 
-      console.log(users);
+      console.log("users");
     }
   }, [loaded]);
 
