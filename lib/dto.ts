@@ -13,7 +13,7 @@ export interface CreateUserDTO {
   id: string;
   email: string;
   username: string;
-  isActive: string;
+  isActive: boolean | number;
 }
 
 export interface UpdateUserDTO {

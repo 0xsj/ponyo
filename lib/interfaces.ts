@@ -3,17 +3,20 @@ import { Profile, User } from "./models";
 import { Result } from "./shared/result";
 import { APIError } from "./errors/api-error";
 
-export interface IUser {
-  create?(data: CreateUserDTO): Promise<Result<User, APIError>>;
-  get(id: string): Promise<Result<User, APIError>>;
-  getByUsername?(username: string): Promise<Result<User, APIError>>;
-  update?(id: string, data: Partial<User>): Promise<Result<User, APIError>>;
+export interface IUser<E extends Error = APIError> {
+  create?(data: CreateUserDTO): Promise<Result<User, E>>;
+  get(id: string): Promise<Result<User, E>>;
+  getByUsername?(username: string): Promise<Result<User, E>>;
+  update?(id: string, data: Partial<User>): Promise<Result<User, E>>;
 }
 
-export interface IProfile {
-  get(id: string): Promise<Result<Profile, APIError>>;
+
+export interface IProfile<E extends Error = APIError> {
+  create?(): Promise<Result<Profile, E>>;
+  
+  get(id: string): Promise<Result<Profile, E>>;
   update(
     id: string,
     data: Partial<Profile>,
-  ): Promise<Result<Profile, APIError>>;
+  ): Promise<Result<Profile, E>>;
 }

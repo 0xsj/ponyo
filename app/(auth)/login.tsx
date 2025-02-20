@@ -10,7 +10,6 @@ import { useState } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { useAuthStore } from "@/store/auth.store";
 import { useDebugStorage } from "@/hooks/useDebugStore";
-import { useUser } from "@/hooks/useUser";
 
 export default function Login() {
   const [email, setEmail] = useState("");
