@@ -10,7 +10,7 @@ export const useUserQuery = (id: string, userService: UserService) => {
       const result = await userService.getUserById(id);
       if (result.isErr()) {
         console.error("User not found error:", result.unwrapErr());
-        return null; 
+        return null;
       }
       return result.unwrap();
     },
