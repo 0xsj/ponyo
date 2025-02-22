@@ -13,12 +13,14 @@ import { ThemedView } from "@/components/ThemedView";
 import { useAuth } from "@/hooks/useAuth";
 
 export default function HomeScreen() {
-  const { signOut } = useAuth();
+  const { session, signOut } = useAuth();
   const handleSignOut = async () => {
-    try {
-      await signOut();
-    } catch (error) {
-      console.error(error);
+    const result = await signOut();
+    if (result.isOk()) {
+      console.log("signing out");
+      console.log(session);
+    } else {
+      console.error("sign out failed", result.unwrapErr());
     }
   };
   return (

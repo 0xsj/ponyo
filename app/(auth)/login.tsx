@@ -1,4 +1,5 @@
 // app/(auth)/login.tsx
+import { useState } from "react";
 import {
   View,
   TextInput,
@@ -6,53 +7,77 @@ import {
   Text,
   StyleSheet,
 } from "react-native";
-import { useState } from "react";
-import { useAuth } from "@/hooks/useAuth";
-import { useAuthStore } from "@/store/auth.store";
 import { useDebugStorage } from "@/hooks/useDebugStore";
-import { useUser } from "@/hooks/useUser";
+import { AuthCredentials } from "@/api/auth/domain/auth.entity";
+import { useAuth } from "@/hooks/useAuth";
+import { useRouter } from "expo-router";
 
 export default function Login() {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [email, setEmail] = useState<string>("");
+  const [password, setPassword] = useState<string>("");
+  const [error, setError] = useState<string | null>(null);
   const { signIn, isLoading } = useAuth();
-  const store = useAuthStore();
-
-  useDebugStorage();
 
   const handleLogin = async () => {
-    try {
-      const result = await signIn({ email, password });
-      console.log("Login result:", result);
-    } catch (error) {
-      console.error("Login error:", error);
+    if (!email || !password) {
+      setError("please enter email and password");
+      return;
+    }
+
+    const credentials: AuthCredentials = {
+      identifier: email,
+      secret: password,
+    };
+
+    const result = await signIn(credentials);
+
+    if (result.isErr()) {
+      const error = result.unwrapErr();
+
+      setError(error.message);
+      return;
     }
   };
 
   return (
     <View style={styles.container}>
+      {error && <Text style={styles.error}>{error}</Text>}
+
       <TextInput
         style={styles.input}
         placeholder="Email"
         value={email}
-        onChangeText={setEmail}
+        onChangeText={(text) => {
+          setEmail(text);
+          setError(null);
+        }}
         autoCapitalize="none"
         keyboardType="email-address"
+        // editable={!isLoading}
       />
+
       <TextInput
         style={styles.input}
         placeholder="Password"
         value={password}
-        onChangeText={setPassword}
+        onChangeText={(text) => {
+          setPassword(text);
+          setError(null);
+        }}
         secureTextEntry
+        // editable={!isLoading}
       />
+
       <TouchableOpacity
-        style={styles.button}
+        style={[
+          styles.button,
+          // (!isValid || isLoading) && styles.buttonDisabled
+        ]}
         onPress={handleLogin}
-        disabled={isLoading}
+        // disabled={!isValid || isLoading}
       >
         <Text style={styles.buttonText}>
-          {isLoading ? "Logging in..." : "Login"}
+          {/* {isLoading ? "Logging in..." : "Login"} */}
         </Text>
       </TouchableOpacity>
     </View>
@@ -81,9 +106,17 @@ const styles = StyleSheet.create({
     alignItems: "center",
     borderRadius: 8,
   },
+  buttonDisabled: {
+    backgroundColor: "#007AFF80",
+  },
   buttonText: {
     color: "white",
     fontSize: 16,
     fontWeight: "600",
+  },
+  error: {
+    color: "red",
+    marginBottom: 15,
+    textAlign: "center",
   },
 });

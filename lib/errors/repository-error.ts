@@ -1,215 +1,81 @@
-export enum RepositoryErrorCode {
-  // Resource Errors
-  NotFound = "NOT_FOUND",
-  AlreadyExists = "ALREADY_EXISTS",
+import { ApplicationError } from "./base-error";
 
-  // Authentication/Authorization
-  Unauthorized = "UNAUTHORIZED",
-  InvalidCredentials = "INVALID_CREDENTIALS",
-  InsufficientPrivileges = "INSUFFICIENT_PRIVILEGES",
+type RepositoryErrorKind =
+  | "connection_failed"
+  | "record_not_found"
+  | "unique_violation"
+  | "validation_failed"
+  | "query_failed"
+  | "invalid_session";
 
-  // Data Integrity
-  UniqueViolation = "UNIQUE_VIOLATION",
-  ForeignKeyViolation = "FOREIGN_KEY_VIOLATION",
-  NotNullViolation = "NOT_NULL_VIOLATION",
-  CheckViolation = "CHECK_VIOLATION",
-
-  // Connection/System
-  ConnectionError = "CONNECTION_ERROR",
-  ConnectionTimeout = "CONNECTION_TIMEOUT",
-  ConnectionLost = "CONNECTION_LOST",
-
-  // Query/Syntax
-  InvalidQuery = "INVALID_QUERY",
-  InvalidParameter = "INVALID_PARAMETER",
-  SyntaxError = "SYNTAX_ERROR",
-
-  // Data
-  InvalidDataFormat = "INVALID_DATA_FORMAT",
-  DataTooLong = "DATA_TOO_LONG",
-  InvalidTextRepresentation = "INVALID_TEXT_REPRESENTATION",
-  NumericValueOutOfRange = "NUMERIC_VALUE_OUT_OF_RANGE",
-
-  // Transaction
-  TransactionError = "TRANSACTION_ERROR",
-  SerializationFailure = "SERIALIZATION_FAILURE",
-  DeadlockDetected = "DEADLOCK_DETECTED",
-
-  // Schema
-  TableNotFound = "TABLE_NOT_FOUND",
-  ColumnNotFound = "COLUMN_NOT_FOUND",
-  UndefinedColumn = "UNDEFINED_COLUMN",
-  UndefinedTable = "UNDEFINED_TABLE",
-
-  // System
-  OutOfMemory = "OUT_OF_MEMORY",
-  DiskFull = "DISK_FULL",
-
-  // Catch-all
-  UnknownError = "UNKNOWN_ERROR",
-}
-
-export class RepositoryError extends Error {
+export class RepositoryError extends ApplicationError<RepositoryErrorKind> {
   constructor(
-    public readonly code: RepositoryErrorCode,
+    public readonly kind: RepositoryErrorKind,
     message: string,
-    public readonly details?: Record<string, any>,
-    public readonly originalError?: any,
+    public readonly code: string,
+    public readonly status: number,
+    context?: Record<string, unknown>,
   ) {
-    super(message);
-    this.name = "RepositoryError";
+    super(message, context);
   }
 
-  static fromPostgresError(error: any, resource: string): RepositoryError {
-    const errorCode = error?.code;
-    const message = error?.message || `${resource} operation failed`;
-    const details = error?.details;
+  static connectionFailed(message: string, context?: Record<string, unknown>) {
+    return new RepositoryError(
+      "connection_failed",
+      message,
+      "DB_CONNECTION_ERROR",
+      503,
+      context,
+    );
+  }
 
-    // Map Postgres error codes to RepositoryErrorCode
-    switch (errorCode) {
-      // Resource errors
-      case "PGRST116":
-        return new RepositoryError(
-          RepositoryErrorCode.NotFound,
-          `${resource} not found`,
-          details,
-          error,
-        );
+  static recordNotFound(entity: string, id: string) {
+    return new RepositoryError(
+      "record_not_found",
+      `${entity} not found: ${id}`,
+      "NOT_FOUND",
+      404,
+      { entity, id },
+    );
+  }
 
-      // Authentication/Authorization
-      case "28000":
-      case "28P01":
-        return new RepositoryError(
-          RepositoryErrorCode.InvalidCredentials,
-          "Invalid credentials",
-          details,
-          error,
-        );
-      case "42501":
-        return new RepositoryError(
-          RepositoryErrorCode.InsufficientPrivileges,
-          "Insufficient privileges",
-          details,
-          error,
-        );
+  static uniqueViolation(entity: string, field: string) {
+    return new RepositoryError(
+      "unique_violation",
+      `${entity} with this ${field} already exists`,
+      "CONFLICT",
+      409,
+      { entity, field },
+    );
+  }
 
-      // Data Integrity
-      case "23505":
-        return new RepositoryError(
-          RepositoryErrorCode.UniqueViolation,
-          "Unique constraint violation",
-          details,
-          error,
-        );
-      case "23503":
-        return new RepositoryError(
-          RepositoryErrorCode.ForeignKeyViolation,
-          "Foreign key violation",
-          details,
-          error,
-        );
-      case "23502":
-        return new RepositoryError(
-          RepositoryErrorCode.NotNullViolation,
-          "Not null violation",
-          details,
-          error,
-        );
-      case "23514":
-        return new RepositoryError(
-          RepositoryErrorCode.CheckViolation,
-          "Check constraint violation",
-          details,
-          error,
-        );
+  static queryFailed(message: string, context?: Record<string, unknown>) {
+    return new RepositoryError(
+      "query_failed",
+      message,
+      "QUERY_ERROR",
+      500,
+      context,
+    );
+  }
 
-      // Connection/System
-      case "08000":
-        return new RepositoryError(
-          RepositoryErrorCode.ConnectionError,
-          "Connection error",
-          details,
-          error,
-        );
-      case "08006":
-        return new RepositoryError(
-          RepositoryErrorCode.ConnectionLost,
-          "Connection lost",
-          details,
-          error,
-        );
+  static validationFailed(message: string, context?: Record<string, unknown>) {
+    return new RepositoryError(
+      "validation_failed",
+      message,
+      "VALIDATION_ERROR",
+      400,
+      context,
+    );
+  }
 
-      // Query/Syntax
-      case "42601":
-        return new RepositoryError(
-          RepositoryErrorCode.SyntaxError,
-          "Syntax error",
-          details,
-          error,
-        );
-      case "42P01":
-        return new RepositoryError(
-          RepositoryErrorCode.TableNotFound,
-          "Table not found",
-          details,
-          error,
-        );
-      case "42703":
-        return new RepositoryError(
-          RepositoryErrorCode.UndefinedColumn,
-          "Undefined column",
-          details,
-          error,
-        );
-
-      // Data format
-      case "22000":
-      case "22P02":
-        return new RepositoryError(
-          RepositoryErrorCode.InvalidDataFormat,
-          "Invalid data format",
-          details,
-          error,
-        );
-      case "22001":
-        return new RepositoryError(
-          RepositoryErrorCode.DataTooLong,
-          "Data too long",
-          details,
-          error,
-        );
-      case "22003":
-        return new RepositoryError(
-          RepositoryErrorCode.NumericValueOutOfRange,
-          "Numeric value out of range",
-          details,
-          error,
-        );
-
-      // Transaction
-      case "40001":
-        return new RepositoryError(
-          RepositoryErrorCode.SerializationFailure,
-          "Serialization failure",
-          details,
-          error,
-        );
-      case "40P01":
-        return new RepositoryError(
-          RepositoryErrorCode.DeadlockDetected,
-          "Deadlock detected",
-          details,
-          error,
-        );
-
-      // Default case
-      default:
-        return new RepositoryError(
-          RepositoryErrorCode.UnknownError,
-          message,
-          details,
-          error,
-        );
-    }
+  static invalidSession(message: string, context?: Record<string, unknown>) {
+    return new RepositoryError(
+      "invalid_session",
+      message,
+      "INVALID_SESSION",
+      400,
+      context,
+    );
   }
 }

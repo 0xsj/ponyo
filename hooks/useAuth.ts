@@ -1,15 +1,33 @@
-import { useAuthStore } from "@/store/auth.store";
+import { useCallback } from "react";
+import { getAuthStore } from "@/store/auth.store";
+import { AuthCredentials } from "@/api/auth/domain/auth.entity";
+import { useService } from "@/lib/providers/service-provider";
 
 export const useAuth = () => {
-  const store = useAuthStore();
+  const { queries } = useService("auth");
+  const store = getAuthStore();
+  const state = store();
+
+  const signIn = useCallback(async (credentials: AuthCredentials) => {
+    store.getState().setLoading(true);
+    const result = await queries.signIn(credentials);
+    store.getState().setLoading(false);
+    return result;
+  }, []);
+
+  const signOut = useCallback(async () => {
+    store.getState().setLoading(true);
+    const result = await queries.signOut();
+    store.getState().setLoading(false);
+    return result;
+  }, []);
+
+  const isAuthenticated = !!state.session || !!state.user;
 
   return {
-    user: store.session?.user ?? null,
-    isAuthenticated: !!store.session,
-    isLoading: store.isLoading,
-    signIn: store.signIn,
-    signUp: store.signUp,
-    signOut: store.signOut,
-    signInWithProvider: store.signInWithProvider,
+    ...state,
+    signIn,
+    signOut,
+    isAuthenticated,
   };
 };
