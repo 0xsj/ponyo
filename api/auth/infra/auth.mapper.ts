@@ -7,7 +7,7 @@ import {
   AuthSession,
   authUserSchema,
   authSessionSchema,
-} from "./auth.entity";
+} from "../domain/auth.entity";
 import { Result } from "@/lib/shared/result";
 import { ValidationError } from "@/lib/errors/validation-error";
 
@@ -34,9 +34,7 @@ export class AuthMapper {
 
     const result = authUserSchema.safeParse(userData);
     if (!result.success) {
-      return Result.Err(
-        ValidationError.fromZod(result.error), 
-      );
+      return Result.Err(ValidationError.fromZod(result.error));
     }
 
     return Result.Ok(result.data);
@@ -46,7 +44,7 @@ export class AuthMapper {
     supabaseSession: SupabaseSession | null,
   ): Result<AuthSession | null, ValidationError> {
     if (!supabaseSession) {
-      return Result.Ok(null); 
+      return Result.Ok(null);
     }
 
     const userResult = this.toAuthUser(supabaseSession.user);
@@ -58,7 +56,7 @@ export class AuthMapper {
       user: userResult.unwrap(),
       accessToken: supabaseSession.access_token,
       refreshToken: supabaseSession.refresh_token,
-      expiresAt: supabaseSession.expires_at ?? Date.now() + 3600, 
+      expiresAt: supabaseSession.expires_at ?? Date.now() + 3600,
     };
 
     const result = authSessionSchema.safeParse(sessionData);

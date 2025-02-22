@@ -1,8 +1,8 @@
+// store/auth.store.ts
 import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
 import { zustandStorage } from "@/lib/storage/persist-storage";
-import { AuthSession, AuthUser } from "@/api/auth/auth.entity";
-import { AuthQueries } from "@/api/auth/auth.queries";
+import { AuthSession, AuthUser } from "@/api/auth/domain/auth.entity";
 
 interface AuthState {
   session: AuthSession | null;
@@ -62,10 +62,7 @@ const createAuthStore = () =>
     ),
   );
 
-export type AuthStore = ReturnType<typeof createAuthStore>;
-export { createAuthStore };
-
-let authStore: AuthStore | null = null;
+let authStore: ReturnType<typeof createAuthStore> | null = null;
 
 export const getAuthStore = () => {
   if (!authStore) {
@@ -74,30 +71,4 @@ export const getAuthStore = () => {
   return authStore;
 };
 
-export const useAuthStoreSync = (store: AuthStore, queries: AuthQueries) => {
-  queries.onAuthStateChange((payload) => {
-    if (payload.session) {
-      store.setState({
-        session: payload.session,
-        user: payload.session.user,
-        isAuthenticated: true,
-      });
-    } else {
-      store.setState(initialState);
-    }
-  });
-
-  queries.getSession().then((result) => {
-    if (result.isOk()) {
-      store.setState({
-        session: result.unwrap(),
-        user: result.unwrap().user,
-        isAuthenticated: true,
-      });
-    }
-  });
-
-  return () => {
-    // Cleanup if needed
-  };
-};
+export type AuthStore = ReturnType<typeof createAuthStore>;

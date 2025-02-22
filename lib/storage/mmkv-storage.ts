@@ -1,9 +1,8 @@
 import { MMKV } from "react-native-mmkv";
-import { IAuthStorage } from "../core";
 
 const storage = new MMKV();
 
-export class MMKVStorageAdapter implements IAuthStorage {
+export class MMKVStorageAdapter {
   async getItem(key: string): Promise<string | null> {
     try {
       const value = storage.getString(key);

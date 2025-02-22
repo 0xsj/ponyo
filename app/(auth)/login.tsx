@@ -8,50 +8,36 @@ import {
   StyleSheet,
 } from "react-native";
 import { useDebugStorage } from "@/hooks/useDebugStore";
-import { AuthCredentials } from "@/api/auth/auth.entity";
+import { AuthCredentials } from "@/api/auth/domain/auth.entity";
 import { useAuth } from "@/hooks/useAuth";
 import { useRouter } from "expo-router";
 
 export default function Login() {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [email, setEmail] = useState<string>("");
+  const [password, setPassword] = useState<string>("");
   const [error, setError] = useState<string | null>(null);
-  const {signIn} = useAuth();
-
-  const router = useRouter();
+  const { signIn, isLoading } = useAuth();
 
   const handleLogin = async () => {
-    console.log("Login button pressed");
-
     if (!email || !password) {
-      setError("Please enter email and password");
+      setError("please enter email and password");
       return;
     }
 
-    try {
-      const credentials: AuthCredentials = { identifier: email, secret: password };
-      console.log("Calling signIn with credentials:", credentials);
+    const credentials: AuthCredentials = {
+      identifier: email,
+      secret: password,
+    };
 
-      const result = await signIn(credentials);
+    const result = await signIn(credentials);
 
-      if (result.isOk()) {
-        console.log("Login successful");
-        setEmail("");
-        setPassword("");
-        setError(null);
+    if (result.isErr()) {
+      const error = result.unwrapErr();
 
-        router.replace("/(tabs)");
-      } else {
-        console.error("Login error:", result.unwrapErr());
-        setError("Invalid email or password");
-      }
-    } catch (error) {
-      console.error("Login error:", error);
-      setError("Invalid email or password");
+      setError(error.message);
+      return;
     }
   };
-
-  useDebugStorage();
 
   return (
     <View style={styles.container}>

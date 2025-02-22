@@ -1,7 +1,7 @@
 import { useCallback } from "react";
 import { getAuthStore } from "@/store/auth.store";
-import { AuthCredentials } from "@/api/auth/auth.entity";
-import { useService } from "@/lib/providers/app-provider";
+import { AuthCredentials } from "@/api/auth/domain/auth.entity";
+import { useService } from "@/lib/providers/service-provider";
 
 export const useAuth = () => {
   const { queries } = useService("auth");
@@ -28,6 +28,6 @@ export const useAuth = () => {
     ...state,
     signIn,
     signOut,
-    isAuthenticated
+    isAuthenticated,
   };
 };

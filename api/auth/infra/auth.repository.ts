@@ -1,6 +1,6 @@
 //auth.repository
 import { TypedSupabaseClient } from "@/lib/supabase/client/supabase-client";
-import { IAuth } from "./auth.interface";
+import { IAuth } from "../domain/auth.interface";
 import {
   AuthCredentials,
   AuthEventPayload,
@@ -8,7 +8,7 @@ import {
   AuthSession,
   AuthUser,
   OAuthProvider,
-} from "./auth.entity";
+} from "../domain/auth.entity";
 import { RepositoryError } from "@/lib/errors/repository-error";
 import { Result } from "@/lib/shared/result";
 import { AuthMapper } from "./auth.mapper";
@@ -88,7 +88,7 @@ export class AuthRepository implements IAuth<RepositoryError> {
           error: { message: "Invalid authentication method" },
           type: "invalid" as const,
         }));
-  
+
       if (result.error) {
         return Result.Err(
           RepositoryError.queryFailed(result.error.message, {
@@ -97,7 +97,7 @@ export class AuthRepository implements IAuth<RepositoryError> {
           }),
         );
       }
-  
+
       const sessionResult = AuthMapper.toAuthSession(
         result.data?.session ?? null,
       );
@@ -111,14 +111,14 @@ export class AuthRepository implements IAuth<RepositoryError> {
           ),
         );
       }
-  
+
       const session = sessionResult.unwrap();
       if (!session) {
         return Result.Err(
           RepositoryError.invalidSession("Session data is null or invalid"),
         );
       }
-  
+
       return Result.Ok(session);
     } catch (error) {
       return Result.Err(
@@ -180,23 +180,23 @@ export class AuthRepository implements IAuth<RepositoryError> {
   updatePassword(newSecret: string): Promise<Result<void, RepositoryError>> {
     throw new Error("Method not implemented.");
   }
-  onAuthStateChange(callback: (payload: AuthEventPayload) => void): () => void {
-    const { data: { subscription } } = this.supabase.auth.onAuthStateChange(
-      (event, session) => {
-        const payload: AuthEventPayload = {
-          type: event as AuthEventType,
-          session: session ? AuthMapper.toAuthSession(session).unwrapOr(null) : null,
-          user: session?.user ? AuthMapper.toAuthUser(session.user).unwrapOr(null) : null,
-        };
-        callback(payload);
-      }
-    );
-  
-    return () => {
-      subscription?.unsubscribe();
-    };
-  }
-  
+  // onAuthStateChange(callback: (payload: AuthEventPayload) => void): () => void {
+  //   const { data: { subscription } } = this.supabase.auth.onAuthStateChange(
+  //     (event, session) => {
+  //       const payload: AuthEventPayload = {
+  //         type: event as AuthEventType,
+  //         session: session ? AuthMapper.toAuthSession(session).unwrapOr(null) : null,
+  //         user: session?.user ? AuthMapper.toAuthUser(session.user).unwrapOr(null) : null,
+  //       };
+  //       callback(payload);
+  //     }
+  //   );
+
+  //   return () => {
+  //     subscription?.unsubscribe();
+  //   };
+  // }
+
   initialize(): Promise<void> {
     throw new Error("Method not implemented.");
   }

@@ -1,7 +1,7 @@
 import { BaseModule, ModuleFactory } from "@/lib/core/base.module";
-import { AuthRepository } from "./auth.repository";
-import { AuthService } from "./auth.service";
-import { AuthQueries, createAuthQueries } from "./auth.queries";
+import { AuthRepository } from "./infra/auth.repository";
+import { AuthService } from "./core/auth.service";
+import { AuthQueries, createAuthQueries } from "./core/auth.queries";
 
 export interface AuthModule
   extends BaseModule<AuthRepository, AuthService, AuthQueries> {}

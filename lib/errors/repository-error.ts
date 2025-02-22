@@ -6,7 +6,7 @@ type RepositoryErrorKind =
   | "unique_violation"
   | "validation_failed"
   | "query_failed"
-  | "invalid_session"
+  | "invalid_session";
 
 export class RepositoryError extends ApplicationError<RepositoryErrorKind> {
   constructor(

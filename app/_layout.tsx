@@ -11,10 +11,8 @@ import { useEffect } from "react";
 import "react-native-reanimated";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { SeviceProvider } from "../lib/providers/app-provider";
-import { useAuth } from "@/hooks/useAuth";
-import { useProtectedRoute } from "@/hooks/useProtectedRoute";
-import { useAuthNavigation } from "@/hooks/useSession";
+import { ServiceProvider } from "@/lib/providers/service-provider";
+import { AuthProvider } from "@/lib/providers/auth-provider";
 
 SplashScreen.preventAutoHideAsync();
 
@@ -31,10 +29,6 @@ const queryClient = new QueryClient({
 
 export default function RootLayout() {
   const colorScheme = useColorScheme();
-  const segments = useSegments();
-  const router = useRouter();
-  const {checkAuthAndRedirect} = useAuthNavigation();
-
 
   const [loaded] = useFonts({
     SpaceMono: require("../assets/fonts/SpaceMono-Regular.ttf"),
@@ -44,25 +38,27 @@ export default function RootLayout() {
     if (loaded) {
       console.log("AppLoaded");
       SplashScreen.hideAsync();
-      checkAuthAndRedirect();
     }
   }, [loaded]);
-  
+
+  if (!loaded) return null;
 
   return (
     <QueryClientProvider client={queryClient}>
-      <SeviceProvider>
-        <ThemeProvider
-          value={colorScheme === "dark" ? DarkTheme : DefaultTheme}
-        >
-          <Stack>
-            <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-            <Stack.Screen name="(auth)" options={{ headerShown: false }} />
-            <Stack.Screen name="+not-found" />
-          </Stack>
-          <StatusBar style="auto" />
-        </ThemeProvider>
-      </SeviceProvider>
+      <ServiceProvider>
+        <AuthProvider>
+          <ThemeProvider
+            value={colorScheme === "dark" ? DarkTheme : DefaultTheme}
+          >
+            <Stack>
+              <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+              <Stack.Screen name="(auth)" options={{ headerShown: false }} />
+              <Stack.Screen name="+not-found" />
+            </Stack>
+            <StatusBar style="auto" />
+          </ThemeProvider>
+        </AuthProvider>
+      </ServiceProvider>
     </QueryClientProvider>
   );
 }

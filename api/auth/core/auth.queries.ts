@@ -1,13 +1,13 @@
 // auth.queries.ts
 import { QueryClient } from "@tanstack/react-query";
-import { IAuth, IAuthQueries } from "./auth.interface";
+import { IAuth } from "../domain/auth.interface";
 import {
   AuthCredentials,
   AuthEventPayload,
   AuthSession,
   AuthUser,
   OAuthProvider,
-} from "./auth.entity";
+} from "../domain/auth.entity";
 import { QueryError } from "@/lib/errors/query-error";
 import { Result } from "@/lib/shared/result";
 import { ServiceError } from "@/lib/errors/service-error";
@@ -18,7 +18,7 @@ export const authKeys = {
   user: () => [...authKeys.all, "user"] as const,
 } as const;
 
-export class AuthQueries implements IAuthQueries {
+export class AuthQueries {
   constructor(
     private readonly authService: IAuth<ServiceError>,
     private readonly queryClient: QueryClient,
@@ -90,9 +90,9 @@ export class AuthQueries implements IAuthQueries {
     return this.authService.updatePassword(newSecret);
   }
 
-  onAuthStateChange(callback: (payload: AuthEventPayload) => void) {
-    return this.authService.onAuthStateChange(callback);
-  }
+  // onAuthStateChange(callback: (payload: AuthEventPayload) => void) {
+  //   return this.authService.onAuthStateChange(callback);
+  // }
 
   async initialize() {
     return this.authService.initialize();

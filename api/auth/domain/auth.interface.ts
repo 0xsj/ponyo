@@ -34,7 +34,7 @@ export interface IAuth<E extends Error> {
   updatePassword(newSecret: string): Promise<Result<void, E>>;
 
   // Event handling
-  onAuthStateChange(callback: (payload: AuthEventPayload) => void): () => void;
+  // onAuthStateChange(callback: (payload: AuthEventPayload) => void): () => void;
 
   // Lifecycle
   initialize(): Promise<void>;
@@ -46,5 +46,3 @@ export interface IAuthRepository extends IAuth<RepositoryError> {}
 
 // Service implementation
 export interface IAuthService extends IAuth<ServiceError> {}
-
-export interface IAuthQueries extends IAuth<ServiceError> {}

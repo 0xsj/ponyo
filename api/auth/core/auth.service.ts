@@ -1,7 +1,7 @@
 //auth.service
 
 import { ServiceError } from "@/lib/errors/service-error";
-import { IAuth } from "./auth.interface";
+import { IAuth } from "../domain/auth.interface";
 import { Result } from "@/lib/shared/result";
 import {
   AuthCredentials,
@@ -9,8 +9,8 @@ import {
   OAuthProvider,
   AuthEventPayload,
   AuthSession,
-} from "./auth.entity";
-import { AuthRepository } from "./auth.repository";
+} from "../domain/auth.entity";
+import { AuthRepository } from "../infra/auth.repository";
 
 export class AuthService implements IAuth<ServiceError> {
   constructor(private readonly authRepository: AuthRepository) {}
@@ -192,10 +192,10 @@ export class AuthService implements IAuth<ServiceError> {
   updatePassword(newSecret: string): Promise<Result<void, ServiceError>> {
     throw new Error("Method not implemented.");
   }
-  onAuthStateChange(callback: (payload: AuthEventPayload) => void): () => void {
-    return this.authRepository.onAuthStateChange(callback);
-  }
-  
+  // onAuthStateChange(callback: (payload: AuthEventPayload) => void): () => void {
+  //   return this.authRepository.onAuthStateChange(callback);
+  // }
+
   initialize(): Promise<void> {
     throw new Error("Method not implemented.");
   }
