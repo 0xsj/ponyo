@@ -1,4 +1,5 @@
 // app/(auth)/login.tsx
+import { useState } from "react";
 import {
   View,
   TextInput,
@@ -6,52 +7,89 @@ import {
   Text,
   StyleSheet,
 } from "react-native";
-import { useState } from "react";
-import { useAuth } from "@/hooks/useAuth";
-import { useAuthStore } from "@/store/auth.store";
 import { useDebugStorage } from "@/hooks/useDebugStore";
+import { AuthCredentials } from "@/api/auth/auth.entity";
+import { useAuth } from "@/hooks/useAuth";
+import { useRouter } from "expo-router";
 
 export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const { signIn, isLoading } = useAuth();
-  const store = useAuthStore();
+  const [error, setError] = useState<string | null>(null);
+  const {signIn} = useAuth();
 
-  useDebugStorage();
+  const router = useRouter();
 
   const handleLogin = async () => {
+    console.log("Login button pressed");
+    
+    if (!email || !password) {
+      setError("Please enter email and password");
+      return;
+    }
+  
     try {
-      const result = await signIn({ email, password });
-      console.log("Login result:", result);
+      const credentials: AuthCredentials = { identifier: email, secret: password };
+      console.log("Calling signIn with credentials:", credentials);
+      
+      await signIn(credentials)
+        .then(() => {
+          console.log("Login successful");
+          setEmail("");
+          setPassword("");
+          setError(null);
+        })
+        .catch((error) => {
+          console.error("Login error:", error);
+          setError("Invalid email or password");
+        });
     } catch (error) {
       console.error("Login error:", error);
+      setError("Invalid email or password");
     }
   };
 
+  useDebugStorage();
+
   return (
     <View style={styles.container}>
+      {error && <Text style={styles.error}>{error}</Text>}
+
       <TextInput
         style={styles.input}
         placeholder="Email"
         value={email}
-        onChangeText={setEmail}
+        onChangeText={(text) => {
+          setEmail(text);
+          setError(null);
+        }}
         autoCapitalize="none"
         keyboardType="email-address"
+        // editable={!isLoading}
       />
+
       <TextInput
         style={styles.input}
         placeholder="Password"
         value={password}
-        onChangeText={setPassword}
+        onChangeText={(text) => {
+          setPassword(text);
+          setError(null);
+        }}
         secureTextEntry
+        // editable={!isLoading}
       />
+
       <TouchableOpacity
-        style={styles.button}
+        style={[
+          styles.button,
+          // (!isValid || isLoading) && styles.buttonDisabled
+        ]}
         onPress={handleLogin}
-        disabled={isLoading}
+        // disabled={!isValid || isLoading}
       >
         <Text style={styles.buttonText}>
-          {isLoading ? "Logging in..." : "Login"}
+          {/* {isLoading ? "Logging in..." : "Login"} */}
         </Text>
       </TouchableOpacity>
     </View>
@@ -80,9 +118,17 @@ const styles = StyleSheet.create({
     alignItems: "center",
     borderRadius: 8,
   },
+  buttonDisabled: {
+    backgroundColor: "#007AFF80",
+  },
   buttonText: {
     color: "white",
     fontSize: 16,
     fontWeight: "600",
+  },
+  error: {
+    color: "red",
+    marginBottom: 15,
+    textAlign: "center",
   },
 });

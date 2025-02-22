@@ -10,17 +10,22 @@ import { HelloWave } from "@/components/HelloWave";
 import ParallaxScrollView from "@/components/ParallaxScrollView";
 import { ThemedText } from "@/components/ThemedText";
 import { ThemedView } from "@/components/ThemedView";
+import { createAuthQueries } from "@/api/auth/auth.queries";
 import { useAuth } from "@/hooks/useAuth";
+import { useProtectedRoute } from "@/hooks/useProtectedRoute";
 
 export default function HomeScreen() {
-  const { signOut } = useAuth();
+  useProtectedRoute();
+  const { session, signOut } = useAuth();
   const handleSignOut = async () => {
-    try {
-      await signOut();
-    } catch (error) {
-      console.error(error);
+    const result = await signOut();
+    if(result.isOk()) {
+      console.log('signing out')
+      console.log(session)
+    } else {
+      console.error("sign out failed", result.unwrapErr())
     }
-  };
+  }
   return (
     <View style={{ flex: 1 }}>
       <TouchableOpacity onPress={handleSignOut} style={styles.signOutButton}>

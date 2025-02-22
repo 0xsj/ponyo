@@ -7,15 +7,14 @@ import { IconSymbol } from "@/components/ui/IconSymbol";
 import TabBarBackground from "@/components/ui/TabBarBackground";
 import { Colors } from "@/constants/Colors";
 import { useColorScheme } from "@/hooks/useColorScheme";
-import { useUser } from "@/hooks/useUser";
 
 export default function TabLayout() {
   const colorScheme = useColorScheme();
-  const { data: user, isLoading: userLoading } = useUser(
-    "52323019-384b-4673-a4ec-f17a995dc36e",
-  );
+  // const { data: user, isLoading: userLoading } = useUser(
+  //   "52323019-384b-4673-a4ec-f17a995dc36e",
+  // );
 
-  console.log(user);
+  // console.log(user);
 
   return (
     <Tabs

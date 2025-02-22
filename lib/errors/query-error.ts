@@ -1,9 +1,6 @@
 import { ApplicationError } from "./base-error";
 
-type QueryErrorKind = 
-  | "query_failed"
-  | "cache_failed"
-  | "stale_data";
+type QueryErrorKind = "query_failed" | "cache_failed" | "stale_data";
 
 export class QueryError extends ApplicationError<QueryErrorKind> {
   constructor(
@@ -12,7 +9,7 @@ export class QueryError extends ApplicationError<QueryErrorKind> {
     public readonly code: string,
     public readonly status: number,
     public readonly retry: boolean,
-    context?: Record<string, unknown>
+    context?: Record<string, unknown>,
   ) {
     super(message, context);
   }

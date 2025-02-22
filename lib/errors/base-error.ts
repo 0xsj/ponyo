@@ -38,7 +38,10 @@
  * //   context: { resource: 'User' }
  * // }
  */
-export abstract class ApplicationError<K extends string, C = unknown> {
+export abstract class ApplicationError<
+  K extends string,
+  C = unknown,
+> extends Error {
   abstract readonly kind: K;
   abstract readonly code: string;
   abstract readonly status: number;
@@ -46,7 +49,11 @@ export abstract class ApplicationError<K extends string, C = unknown> {
   constructor(
     public readonly message: string,
     public readonly context?: C,
-  ) {}
+  ) {
+    super(message);
+    this.name = this.constructor.name;
+    Object.setPrototypeOf(this, new.target.prototype);
+  }
 
   public toJSON() {
     return {

@@ -5,9 +5,10 @@ type RepositoryErrorKind =
   | "record_not_found"
   | "unique_violation"
   | "validation_failed"
-  | "query_failed";
+  | "query_failed"
+  | "invalid_session"
 
-export class RepsitoryError extends ApplicationError<RepositoryErrorKind> {
+export class RepositoryError extends ApplicationError<RepositoryErrorKind> {
   constructor(
     public readonly kind: RepositoryErrorKind,
     message: string,
@@ -19,7 +20,7 @@ export class RepsitoryError extends ApplicationError<RepositoryErrorKind> {
   }
 
   static connectionFailed(message: string, context?: Record<string, unknown>) {
-    return new RepsitoryError(
+    return new RepositoryError(
       "connection_failed",
       message,
       "DB_CONNECTION_ERROR",
@@ -29,7 +30,7 @@ export class RepsitoryError extends ApplicationError<RepositoryErrorKind> {
   }
 
   static recordNotFound(entity: string, id: string) {
-    return new RepsitoryError(
+    return new RepositoryError(
       "record_not_found",
       `${entity} not found: ${id}`,
       "NOT_FOUND",
@@ -39,7 +40,7 @@ export class RepsitoryError extends ApplicationError<RepositoryErrorKind> {
   }
 
   static uniqueViolation(entity: string, field: string) {
-    return new RepsitoryError(
+    return new RepositoryError(
       "unique_violation",
       `${entity} with this ${field} already exists`,
       "CONFLICT",
@@ -49,7 +50,7 @@ export class RepsitoryError extends ApplicationError<RepositoryErrorKind> {
   }
 
   static queryFailed(message: string, context?: Record<string, unknown>) {
-    return new RepsitoryError(
+    return new RepositoryError(
       "query_failed",
       message,
       "QUERY_ERROR",
@@ -59,10 +60,20 @@ export class RepsitoryError extends ApplicationError<RepositoryErrorKind> {
   }
 
   static validationFailed(message: string, context?: Record<string, unknown>) {
-    return new RepsitoryError(
+    return new RepositoryError(
       "validation_failed",
       message,
       "VALIDATION_ERROR",
+      400,
+      context,
+    );
+  }
+
+  static invalidSession(message: string, context?: Record<string, unknown>) {
+    return new RepositoryError(
+      "invalid_session",
+      message,
+      "INVALID_SESSION",
       400,
       context,
     );
