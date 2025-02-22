@@ -22,27 +22,29 @@ export default function Login() {
 
   const handleLogin = async () => {
     console.log("Login button pressed");
-    
+
     if (!email || !password) {
       setError("Please enter email and password");
       return;
     }
-  
+
     try {
       const credentials: AuthCredentials = { identifier: email, secret: password };
       console.log("Calling signIn with credentials:", credentials);
-      
-      await signIn(credentials)
-        .then(() => {
-          console.log("Login successful");
-          setEmail("");
-          setPassword("");
-          setError(null);
-        })
-        .catch((error) => {
-          console.error("Login error:", error);
-          setError("Invalid email or password");
-        });
+
+      const result = await signIn(credentials);
+
+      if (result.isOk()) {
+        console.log("Login successful");
+        setEmail("");
+        setPassword("");
+        setError(null);
+
+        router.replace("/(tabs)");
+      } else {
+        console.error("Login error:", result.unwrapErr());
+        setError("Invalid email or password");
+      }
     } catch (error) {
       console.error("Login error:", error);
       setError("Invalid email or password");

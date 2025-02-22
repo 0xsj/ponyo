@@ -14,6 +14,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { SeviceProvider } from "../lib/providers/app-provider";
 import { useAuth } from "@/hooks/useAuth";
 import { useProtectedRoute } from "@/hooks/useProtectedRoute";
+import { useAuthNavigation } from "@/hooks/useSession";
 
 SplashScreen.preventAutoHideAsync();
 
@@ -32,7 +33,7 @@ export default function RootLayout() {
   const colorScheme = useColorScheme();
   const segments = useSegments();
   const router = useRouter();
-  useProtectedRoute();
+  const {checkAuthAndRedirect} = useAuthNavigation();
 
 
   const [loaded] = useFonts({
@@ -43,8 +44,7 @@ export default function RootLayout() {
     if (loaded) {
       console.log("AppLoaded");
       SplashScreen.hideAsync();
-
-
+      checkAuthAndRedirect();
     }
   }, [loaded]);
   

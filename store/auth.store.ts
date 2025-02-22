@@ -61,8 +61,8 @@ const createAuthStore = () =>
       },
     ),
   );
-export type AuthStore = ReturnType<typeof createAuthStore>;
 
+export type AuthStore = ReturnType<typeof createAuthStore>;
 export { createAuthStore };
 
 let authStore: AuthStore | null = null;
