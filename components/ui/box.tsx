@@ -1,5 +1,5 @@
-import React from 'react';
-import { View, ViewStyle, StyleSheet } from 'react-native';
+import React from "react";
+import { View, ViewStyle, StyleSheet } from "react-native";
 
 interface BoxProps extends React.ComponentProps<typeof View> {
   flex?: number;
@@ -88,12 +88,12 @@ export const Box: React.FC<BoxProps> = ({
 
 const styles = StyleSheet.create({
   row: {
-    flexDirection: 'row',
+    flexDirection: "row",
   },
   center: {
-    alignItems: 'center',
+    alignItems: "center",
   },
   middle: {
-    justifyContent: 'center',
+    justifyContent: "center",
   },
 });

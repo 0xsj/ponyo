@@ -1,14 +1,14 @@
 // Text.tsx
-import React from 'react';
-import { Text as RNText, TextStyle, StyleSheet } from 'react-native';
+import React from "react";
+import { Text as RNText, TextStyle, StyleSheet } from "react-native";
 
 interface TextProps extends React.ComponentProps<typeof RNText> {
   flex?: number;
   // Text styling
   c?: string; // color shorthand
   size?: number;
-  w?: 'normal' | 'bold' | '500' | '600' | '700'; // weight shorthand
-  align?: 'auto' | 'left' | 'right' | 'center' | 'justify';
+  w?: "normal" | "bold" | "500" | "600" | "700"; // weight shorthand
+  align?: "auto" | "left" | "right" | "center" | "justify";
   // Margin shorthands
   m?: number;
   mt?: number;
@@ -92,6 +92,6 @@ export const Text: React.FC<TextProps> = ({
 const styles = StyleSheet.create({
   default: {
     fontSize: 16,
-    color: '#000000',
+    color: "#000000",
   },
 });
