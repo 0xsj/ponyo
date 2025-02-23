@@ -13,9 +13,11 @@ export default function HomeScreen() {
       console.error("sign out failed", result.unwrapErr());
     }
   };
+  
+  
   return (
-    <Box flex={1} center middle>
-      <Text>hello world</Text>
+    <Box lightColor="#f0f0f0" darkColor="#222222" flex={1} center middle>
+      <Text lightColor={"#222222"} darkColor={"#f0f0f0"}>hello world</Text>
     </Box>
   );
 }

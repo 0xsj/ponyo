@@ -1,14 +1,20 @@
 // Text.tsx
-import React from "react";
-import { Text as RNText, TextStyle, StyleSheet } from "react-native";
+import React from 'react';
+import { Text as RNText, TextStyle, StyleSheet } from 'react-native';
+import { useThemeColor } from '@/hooks/useThemeColor';
 
 interface TextProps extends React.ComponentProps<typeof RNText> {
   flex?: number;
   // Text styling
   c?: string; // color shorthand
   size?: number;
-  w?: "normal" | "bold" | "500" | "600" | "700"; // weight shorthand
-  align?: "auto" | "left" | "right" | "center" | "justify";
+
+  lightColor: string;
+  darkColor: string;
+
+
+  w?: 'normal' | 'bold' | '500' | '600' | '700'; // weight shorthand
+  align?: 'auto' | 'left' | 'right' | 'center' | 'justify';
   // Margin shorthands
   m?: number;
   mt?: number;
@@ -33,6 +39,8 @@ export const Text: React.FC<TextProps> = ({
   flex,
   // Text styling
   c,
+  lightColor,
+  darkColor,
   size,
   w,
   align,
@@ -81,6 +89,11 @@ export const Text: React.FC<TextProps> = ({
     py !== undefined && { paddingVertical: py },
     style,
   ]) as TextStyle;
+
+  const color = useThemeColor(
+    { light: lightColor, dark: darkColor },
+    typeof c === 'string' && c in Colors.light ? c : 'text'
+  );
 
   return (
     <RNText style={textStyle} {...props}>

@@ -1,5 +1,7 @@
-import React from "react";
-import { View, ViewStyle, StyleSheet } from "react-native";
+import React from 'react';
+import { View, ViewStyle, StyleSheet } from 'react-native';
+import { useThemeColor } from '@/hooks/useThemeColor';
+import { Colors, ThemeColors } from '@/constants/Colors';
 
 interface BoxProps extends React.ComponentProps<typeof View> {
   flex?: number;
@@ -22,8 +24,10 @@ interface BoxProps extends React.ComponentProps<typeof View> {
   pl?: number;
   px?: number;
   py?: number;
-  backgroundColor?: string;
+  backgroundColor?: ThemeColors | string;
   borderRadius?: number;
+  lightColor?: string;
+  darkColor?: string;
 }
 
 export const Box: React.FC<BoxProps> = ({
@@ -33,6 +37,8 @@ export const Box: React.FC<BoxProps> = ({
   row,
   center,
   middle,
+  lightColor, 
+  darkColor,
   // Margin props
   m,
   mt,
@@ -49,10 +55,16 @@ export const Box: React.FC<BoxProps> = ({
   pl,
   px,
   py,
-  backgroundColor,
+  backgroundColor = 'background',
   borderRadius,
   ...props
 }) => {
+
+  const theme = useThemeColor(
+    { light: lightColor, dark: darkColor },
+    backgroundColor as ThemeColors 
+  );
+
   const boxStyle = StyleSheet.flatten([
     flex !== undefined && { flex },
     row && styles.row,
@@ -74,7 +86,9 @@ export const Box: React.FC<BoxProps> = ({
     pl !== undefined && { paddingLeft: pl },
     px !== undefined && { paddingHorizontal: px },
     py !== undefined && { paddingVertical: py },
-    backgroundColor !== undefined && { backgroundColor },
+    backgroundColor !== undefined && {
+      backgroundColor: backgroundColor in Colors.light ? theme : backgroundColor
+    },
     borderRadius !== undefined && { borderRadius },
     style,
   ]) as ViewStyle;
