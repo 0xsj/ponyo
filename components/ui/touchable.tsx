@@ -42,12 +42,12 @@ export const Touchable = React.forwardRef<View, TouchableProps>(
           typeof pressableStyle === "function"
             ? pressableStyle({ pressed })
             : pressed
-            ? pressableStyle?.pressed
-            : pressableStyle?.default,
+              ? pressableStyle?.pressed
+              : pressableStyle?.default,
           style,
         ]}
         {...rest}
       />
     );
-  }
+  },
 );

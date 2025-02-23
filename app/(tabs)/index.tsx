@@ -30,8 +30,8 @@ export default function HomeScreen() {
               opacity: 0.7,
             },
             default: {
-              opacity: 1 
-            }
+              opacity: 1,
+            },
           }}
         >
           <Text color="background" size={16}>

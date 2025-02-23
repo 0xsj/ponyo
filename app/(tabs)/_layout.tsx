@@ -26,9 +26,9 @@ export default function TabLayout() {
         tabBarStyle: Platform.select({
           ios: {
             height: 70,
-            paddingBottom: 10, 
-            backgroundColor: 'background',
-            borderTopWidth: 0, 
+            paddingBottom: 10,
+            backgroundColor: "background",
+            borderTopWidth: 0,
           },
           default: {},
         }),
@@ -85,9 +85,9 @@ export default function TabLayout() {
           tabBarItemStyle: {
             paddingVertical: 10,
           },
-          tabBarIcon: ({color}) => {
-            return <Icon name="user" size={24} color="foreground"/>
-          }
+          tabBarIcon: ({ color }) => {
+            return <Icon name="user" size={24} color="foreground" />;
+          },
         }}
       />
     </Tabs>
