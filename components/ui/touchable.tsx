@@ -1,14 +1,20 @@
 import React from "react";
-import { View, ViewStyle, StyleSheet } from "react-native";
+import {
+  TouchableOpacity,
+  TouchableOpacityProps,
+  StyleSheet,
+  TextStyle,
+  ViewStyle,
+} from "react-native";
 import { useThemeColor } from "@/hooks/useThemeColor";
 import { Colors, ThemeColors } from "@/constants/Colors";
+import { Text } from "./text";
 
-interface BoxProps extends React.ComponentProps<typeof View> {
+interface TouchableProps extends TouchableOpacityProps {
   flex?: number;
   row?: boolean;
   center?: boolean;
   middle?: boolean;
-  // Margin props
   m?: number;
   mt?: number;
   mr?: number;
@@ -16,7 +22,6 @@ interface BoxProps extends React.ComponentProps<typeof View> {
   ml?: number;
   mx?: number;
   my?: number;
-  // Padding props
   p?: number;
   pt?: number;
   pr?: number;
@@ -26,19 +31,19 @@ interface BoxProps extends React.ComponentProps<typeof View> {
   py?: number;
   backgroundColor?: ThemeColors | string;
   borderRadius?: number;
-  lightColor?: string;
-  darkColor?: string;
+  c?: ThemeColors | string; // Color shorthand for text
+  size?: number; // Font size
+  w?: "normal" | "bold" | "500" | "600" | "700"; // Font weight
+  align?: "auto" | "left" | "right" | "center" | "justify"; // Text alignment
 }
 
-export const Box: React.FC<BoxProps> = ({
+export const Touchable: React.FC<TouchableProps> = ({
   children,
   style,
   flex,
   row,
   center,
   middle,
-  lightColor,
-  darkColor,
   // Margin props
   m,
   mt,
@@ -57,14 +62,29 @@ export const Box: React.FC<BoxProps> = ({
   py,
   backgroundColor = "background",
   borderRadius,
+  c,
+  size,
+  w,
+  align,
   ...props
 }) => {
-  const theme = useThemeColor(
-    { light: lightColor, dark: darkColor },
+  const themeBackgroundColor = useThemeColor(
+    {
+      light: Colors.light[backgroundColor as ThemeColors],
+      dark: Colors.dark[backgroundColor as ThemeColors],
+    },
     backgroundColor as ThemeColors,
   );
 
-  const boxStyle = StyleSheet.flatten([
+  const themeTextColor = useThemeColor(
+    {
+      light: Colors.light[c as ThemeColors],
+      dark: Colors.dark[c as ThemeColors],
+    },
+    c as ThemeColors,
+  );
+
+  const touchableStyle = StyleSheet.flatten([
     flex !== undefined && { flex },
     row && styles.row,
     center && styles.center,
@@ -87,16 +107,29 @@ export const Box: React.FC<BoxProps> = ({
     py !== undefined && { paddingVertical: py },
     backgroundColor !== undefined && {
       backgroundColor:
-        backgroundColor in Colors.light ? theme : backgroundColor,
+        backgroundColor in Colors.light
+          ? themeBackgroundColor
+          : backgroundColor,
     },
     borderRadius !== undefined && { borderRadius },
     style,
   ]) as ViewStyle;
 
+  const textStyle = StyleSheet.flatten([
+    c !== undefined && { color: c in Colors.light ? themeTextColor : c },
+    size !== undefined && { fontSize: size },
+    w !== undefined && { fontWeight: w },
+    align !== undefined && { textAlign: align },
+  ]) as TextStyle;
+
   return (
-    <View style={boxStyle} {...props}>
-      {children}
-    </View>
+    <TouchableOpacity style={touchableStyle} {...props}>
+      {typeof children === "string" ? (
+        <Text style={textStyle}>{children}</Text>
+      ) : (
+        children
+      )}
+    </TouchableOpacity>
   );
 };
 

@@ -1,20 +1,17 @@
-// Text.tsx
-import React from 'react';
-import { Text as RNText, TextStyle, StyleSheet } from 'react-native';
-import { useThemeColor } from '@/hooks/useThemeColor';
+import React from "react";
+import { Text as RNText, TextStyle, StyleSheet } from "react-native";
+import { useThemeColor } from "@/hooks/useThemeColor";
+import { Colors } from "@/constants/Colors";
+
+type ThemeColorKeys = keyof typeof Colors.light;
 
 interface TextProps extends React.ComponentProps<typeof RNText> {
   flex?: number;
   // Text styling
-  c?: string; // color shorthand
+  c?: ThemeColorKeys | string;
   size?: number;
-
-  lightColor: string;
-  darkColor: string;
-
-
-  w?: 'normal' | 'bold' | '500' | '600' | '700'; // weight shorthand
-  align?: 'auto' | 'left' | 'right' | 'center' | 'justify';
+  w?: "normal" | "bold" | "500" | "600" | "700"; // weight shorthand
+  align?: "auto" | "left" | "right" | "center" | "justify";
   // Margin shorthands
   m?: number;
   mt?: number;
@@ -39,8 +36,6 @@ export const Text: React.FC<TextProps> = ({
   flex,
   // Text styling
   c,
-  lightColor,
-  darkColor,
   size,
   w,
   align,
@@ -62,12 +57,24 @@ export const Text: React.FC<TextProps> = ({
   py,
   ...props
 }) => {
+  // Check if `c` is a valid theme color key
+  const isThemeColor = typeof c === "string" && c in Colors.light;
+
+  // Use the theme color if `c` is a valid theme key, otherwise use the custom color or fallback to 'text'
+  const color = useThemeColor(
+    {
+      light: Colors.light[c as ThemeColorKeys],
+      dark: Colors.dark[c as ThemeColorKeys],
+    },
+    isThemeColor ? (c as ThemeColorKeys) : "text",
+  );
+
   const textStyle = StyleSheet.flatten([
     styles.default,
     // Base styles
     flex !== undefined && { flex },
     // Text styles
-    c !== undefined && { color: c },
+    c !== undefined && { color: isThemeColor ? color : c }, // Use theme color or custom color
     size !== undefined && { fontSize: size },
     w !== undefined && { fontWeight: w },
     align !== undefined && { textAlign: align },
@@ -90,11 +97,6 @@ export const Text: React.FC<TextProps> = ({
     style,
   ]) as TextStyle;
 
-  const color = useThemeColor(
-    { light: lightColor, dark: darkColor },
-    typeof c === 'string' && c in Colors.light ? c : 'text'
-  );
-
   return (
     <RNText style={textStyle} {...props}>
       {children}
@@ -105,6 +107,6 @@ export const Text: React.FC<TextProps> = ({
 const styles = StyleSheet.create({
   default: {
     fontSize: 16,
-    color: "#000000",
+    color: "#000000", // Default color
   },
 });

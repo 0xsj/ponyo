@@ -11,8 +11,8 @@ import { Text } from "@/components/ui/text";
 
 export default function TabTwoScreen() {
   return (
-    <Box backgroundColor="" flex={1} center middle>
-      <Text>Explore</Text>
+    <Box backgroundColor="background" flex={1} center middle>
+      <Text c="foreground">Explore</Text>
     </Box>
   );
 }

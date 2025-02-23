@@ -43,7 +43,7 @@ export default function RootLayout() {
 
   if (!loaded) return null;
 
-  console.log(colorScheme)
+  console.log(colorScheme);
 
   return (
     <QueryClientProvider client={queryClient}>
