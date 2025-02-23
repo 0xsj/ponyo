@@ -11,12 +11,22 @@ import { useStyleTokens } from "@/theme/utils";
 
 interface TouchableTokens extends StyleTokens {}
 
+interface PressableStyleState {
+  pressed: boolean;
+}
+
+// Define a type for the pressable style object
+interface PressableStyleObject {
+  pressed?: StyleProp<ViewStyle>;
+  default?: StyleProp<ViewStyle>;
+}
+
 export type TouchableProps = Omit<PressableProps, "style"> &
   TouchableTokens & {
     style?: StyleProp<ViewStyle>;
     pressableStyle?:
-      | ((state: { pressed: boolean }) => StyleProp<ViewStyle>)
-      | StyleProp<ViewStyle>;
+      | ((state: PressableStyleState) => StyleProp<ViewStyle>)
+      | PressableStyleObject;
   };
 
 export const Touchable = React.forwardRef<View, TouchableProps>(
@@ -31,11 +41,13 @@ export const Touchable = React.forwardRef<View, TouchableProps>(
           baseStyles,
           typeof pressableStyle === "function"
             ? pressableStyle({ pressed })
-            : pressableStyle,
+            : pressed
+            ? pressableStyle?.pressed
+            : pressableStyle?.default,
           style,
         ]}
         {...rest}
       />
     );
-  },
+  }
 );

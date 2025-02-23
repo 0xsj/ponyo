@@ -25,7 +25,10 @@ export default function TabLayout() {
         tabBarBackground: TabBarBackground,
         tabBarStyle: Platform.select({
           ios: {
-            position: "absolute",
+            height: 70,
+            paddingBottom: 10, 
+            backgroundColor: 'background',
+            borderTopWidth: 0, 
           },
           default: {},
         }),
@@ -41,7 +44,7 @@ export default function TabLayout() {
             paddingVertical: 10,
           },
           tabBarIcon: ({ color }) => (
-            <Icon name="home" size={28} color="foreground" />
+            <Icon name="home" size={24} color="foreground" />
           ),
         }}
       />
@@ -55,7 +58,7 @@ export default function TabLayout() {
             paddingVertical: 10,
           },
           tabBarIcon: ({ color }) => (
-            <Icon name="compass" size={28} color="foreground" />
+            <Icon name="compass" size={24} color="foreground" />
           ),
         }}
       />
@@ -69,7 +72,7 @@ export default function TabLayout() {
             paddingVertical: 10,
           },
           tabBarIcon: ({ color }) => (
-            <Icon name="compass" size={28} color="foreground" />
+            <Icon name="message-circle" size={24} color="foreground" />
           ),
         }}
       />
@@ -83,7 +86,7 @@ export default function TabLayout() {
             paddingVertical: 10,
           },
           tabBarIcon: ({color}) => {
-            return <Icon name="user" size={28} color="foreground"/>
+            return <Icon name="user" size={24} color="foreground"/>
           }
         }}
       />

@@ -25,6 +25,14 @@ export default function HomeScreen() {
           p={16}
           borderRadius={8}
           onPress={handleSignOut}
+          pressableStyle={{
+            pressed: {
+              opacity: 0.7,
+            },
+            default: {
+              opacity: 1 
+            }
+          }}
         >
           <Text color="background" size={16}>
             Sign Out
