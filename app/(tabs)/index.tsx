@@ -17,7 +17,7 @@ export default function HomeScreen() {
   };
 
   return (
-    <Box flex={1} center middle>
+    <Box flex={1} align="center" justify="center">
       <Text c="foreground">hello world</Text>
       <Box pt={30}>
         <Touchable
