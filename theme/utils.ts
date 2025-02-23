@@ -17,6 +17,7 @@ type StyleTokenProps = Omit<StyleTokens, "borderRadius" | "flexBasis"> &
     style?: ViewStyle;
     borderRadius?: RadiiKeys | number;
     flexBasis?: DimensionValue;
+    color?: ColorKeys;
   };
 
 export const useStyleTokens = (props: StyleTokenProps) => {
@@ -71,12 +72,20 @@ export const useStyleTokens = (props: StyleTokenProps) => {
       bg,
       lightBg,
       darkBg,
+      color,
       borderRadius,
 
       // Additional styles
       style,
       ...rest
     } = props;
+
+    const getColor = (value: ColorKeys | undefined): string | undefined => {
+      if (!value) return undefined;
+      return value in theme.colors[colorScheme]
+        ? theme.colors[colorScheme][value]
+        : undefined;
+    };
 
     // Theme value resolver functions
     const getSpacing = (
@@ -150,6 +159,7 @@ export const useStyleTokens = (props: StyleTokenProps) => {
       opacity !== undefined && { opacity },
       display !== undefined && { display },
       bg && { backgroundColor: getBackgroundColor(bg) },
+      color !== undefined && { color: getColor(color) },
       borderRadius !== undefined && { borderRadius: getRadius(borderRadius) },
 
       // Additional styles

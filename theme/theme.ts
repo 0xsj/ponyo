@@ -3,8 +3,10 @@ import { ColorValue, FlexStyle, DimensionValue } from "react-native";
 export const theme = {
   colors: {
     light: {
-      foreground: "#18181b", // gray.900
-      background: "#ffffff",
+      // foreground: "#18181b", // gray.900
+      // background: "#ffffff",
+      background: "#FFFFFF",
+      foreground: "#000000",
       surface: "#f4f4f5", // gray.100
       surfaceHover: "#e4e4e7", // gray.200
       border: "#d4d4d8", // gray.300
@@ -18,8 +20,10 @@ export const theme = {
       info: "#0891b2", // cyan.600
     },
     dark: {
-      foreground: "#f4f4f5", // gray.100
-      background: "#18181b", // gray.900
+      // foreground: "#f4f4f5", // gray.100
+      // background: "#18181b", // gray.900
+      background: "#000000",
+      foreground: "#FFFFFF",
       surface: "#27272a", // gray.800
       surfaceHover: "#3f3f46", // gray.700
       border: "#52525b", // gray.600

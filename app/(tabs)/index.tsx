@@ -18,15 +18,15 @@ export default function HomeScreen() {
 
   return (
     <Box flex={1} align="center" justify="center">
-      <Text c="foreground">hello world</Text>
+      <Text color="foreground">hello world</Text>
       <Box pt={30}>
         <Touchable
-          backgroundColor="foreground"
+          bg="foreground"
           p={16}
           borderRadius={8}
           onPress={handleSignOut}
         >
-          <Text c="background" size={16} w="bold">
+          <Text color="background" size={16}>
             Sign Out
           </Text>
         </Touchable>
