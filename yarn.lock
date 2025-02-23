@@ -1807,6 +1807,11 @@
     canvaskit-wasm "0.39.1"
     react-reconciler "0.27.0"
 
+"@shopify/restyle@^2.4.4":
+  version "2.4.4"
+  resolved "https://registry.yarnpkg.com/@shopify/restyle/-/restyle-2.4.4.tgz#a94dde4e7fcfa03bc5f06648b70ecf47caa661ba"
+  integrity sha512-Y64T8pCSKZi7ChMMfCfe+EJJsqeF+lNLsxYDHbuU63ffLHN7wRwIALJY6VqzcJWZX3fhCztX7AqOkgc7CetfPg==
+
 "@sinclair/typebox@^0.27.8":
   version "0.27.8"
   resolved "https://registry.yarnpkg.com/@sinclair/typebox/-/typebox-0.27.8.tgz#6667fac16c436b5434a387a34dedb013198f6e6e"
@@ -6153,6 +6158,11 @@ react-native-config@^1.5.5:
   version "1.5.5"
   resolved "https://registry.yarnpkg.com/react-native-config/-/react-native-config-1.5.5.tgz#5977db58ff20b6fe9dd6fb28c815a9ba43d018d2"
   integrity sha512-dGdLnBU0cd5xL5bF0ROTmHYbsstZnQKOEPfglvZi1vStvAjpld14X25K6mY3KGPTMWAzx6TbjKeq5dR+ILuMMA==
+
+react-native-feather@^1.1.2:
+  version "1.1.2"
+  resolved "https://registry.yarnpkg.com/react-native-feather/-/react-native-feather-1.1.2.tgz#da055f8bd56db74c1b5009dc470536a11ef1d5c4"
+  integrity sha512-qBc0+XegKkX4JV6ykgScasguEV3RdlbYp9IrCMnbozngOgJ7vi76pyRpb+dnZ1AZVkYsbYnpdA9JXeP7EJbMCA==
 
 react-native-gesture-handler@~2.20.2:
   version "2.20.2"
