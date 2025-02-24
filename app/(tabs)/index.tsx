@@ -10,7 +10,6 @@ export default function HomeScreen() {
     const result = await signOut();
     if (result.isOk()) {
       console.log("signing out");
-      console.log(session);
     } else {
       console.error("sign out failed", result.unwrapErr());
     }
