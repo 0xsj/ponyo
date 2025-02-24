@@ -1,5 +1,5 @@
 import { Tabs } from "expo-router";
-import React from "react";
+import React, { useEffect } from "react";
 import { Platform } from "react-native";
 
 import { HapticTab } from "@/components/HapticTab";
@@ -7,14 +7,26 @@ import TabBarBackground from "@/components/ui/TabBarBackground";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { theme } from "@/theme/theme";
 import { Icon } from "@/components/icon";
+import { useUser } from "@/hooks/useUser";
+import { getUserStore } from "@/store/user.store";
 
 export default function TabLayout() {
   const colorScheme = useColorScheme() ?? "light";
-  // const { data: user, isLoading: userLoading } = useUser(
-  //   "52323019-384b-4673-a4ec-f17a995dc36e",
-  // );
+  const { getUser, currentUser, isLoading } = useUser();
+  const store = getUserStore();
 
-  // console.log(user);
+  useEffect(() => {
+    const fetchUser = async () => {
+      const result = await getUser("52323019-384b-4673-a4ec-f17a995dc36e");
+      if (result.isOk()) {
+        store.getState().setCurrentUser(result.unwrap());
+      } else {
+        console.error("Failed to fetch user:", result.unwrapErr());
+      }
+    };
+
+    fetchUser();
+  }, []);
 
   return (
     <Tabs

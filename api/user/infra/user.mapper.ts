@@ -10,9 +10,9 @@ import {
 import { transformToCamelCase, transformToSnakeCase } from "@/lib/shared/utils";
 
 export class UserMapper {
-  static toUser(data: DBUser): Result<User, ValidationError> {
-    const transformedData = transformToCamelCase(data);
-    const result = userSchema.safeParse(transformedData);
+  static toUser(data: Record<string, any>): Result<User, ValidationError> {
+    const result = userSchema.safeParse(data);
+
     if (!result.success) {
       return Result.Err(ValidationError.fromZod(result.error));
     }

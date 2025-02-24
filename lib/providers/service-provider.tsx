@@ -3,9 +3,11 @@ import { createContext, useContext, PropsWithChildren } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { supabase } from "../supabase/client/supabase-client";
 import { AuthModule, createAuthModule } from "@/api/auth/auth.module";
+import { createUserModule, UserModule } from "@/api/user/user.module";
 
 interface Modules {
   auth: AuthModule;
+  user: UserModule;
 }
 
 const ModuleContext = createContext<Modules | null>(null);
@@ -23,6 +25,7 @@ export function ServiceProvider({ children }: PropsWithChildren) {
 
   const modules: Modules = {
     auth: createAuthModule(supabase, queryClient),
+    user: createUserModule(supabase, queryClient),
   };
 
   return (
