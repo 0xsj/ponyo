@@ -4,13 +4,32 @@ import { SafeAreaView } from "@/components/ui/safe-area-view";
 import { Text } from "@/components/ui/text";
 import { Touchable } from "@/components/ui/touchable";
 import { router } from "expo-router";
+import { ButtonIcon, Icon } from "@/components/icon";
 
-const SOCIAL_BUTTONS = [
-  { id: "google", label: "G" },
-  { id: "facebook", label: "F" },
-  { id: "email", label: "@" },
-  { id: "kakao", label: "K" },
-  { id: "other", label: "..." },
+const SOCIAL_BUTTONS: Array<{
+  id: string;
+  icon: ButtonIcon;
+}> = [
+  {
+    id: "google",
+    icon: { name: "google", iconSet: "fontawesome" },
+  },
+  {
+    id: "facebook",
+    icon: { name: "facebook", iconSet: "fontawesome" },
+  },
+  {
+    id: "email",
+    icon: { name: "mail", iconSet: "feather" },
+  },
+  {
+    id: "discord",
+    icon: { name: "discord", iconSet: "fontawesome" },
+  },
+  {
+    id: "more",
+    icon: { name: "more-horizontal", iconSet: "feather" },
+  },
 ];
 
 const LANGUAGE_EXAMPLES = [
@@ -58,13 +77,26 @@ export default function AuthScreen() {
 
         <Box mb="lg">
           <Touchable
+            style={{
+              flexDirection: "row",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
             bg="surface"
-            py="md"
+            p={"md"}
+            mx="md"
             borderRadius="md"
             pressableStyle={{
               pressed: { opacity: 0.7 },
             }}
           >
+            <Icon
+              name="apple"
+              iconSet="fontawesome"
+              color="foreground"
+              size={24}
+              style={{ marginRight: 8 }}
+            />
             <Text
               fontSize="md"
               fontWeight="medium"
@@ -80,8 +112,8 @@ export default function AuthScreen() {
               <Touchable
                 key={button.id}
                 bg="surface"
-                p="lg"
-                mx={"sm"}
+                p="md"
+                mx="sm"
                 borderRadius="md"
                 onPress={() =>
                   button.id === "email" && router.push("/(auth)/sign-up")
@@ -90,9 +122,12 @@ export default function AuthScreen() {
                   pressed: { opacity: 0.7 },
                 }}
               >
-                <Text fontSize="md" color="foreground">
-                  {button.label}
-                </Text>
+                <Icon
+                  name={button.icon.name}
+                  iconSet={button.icon.iconSet}
+                  size={24}
+                  color="foreground"
+                />
               </Touchable>
             ))}
           </Box>
