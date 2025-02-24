@@ -38,7 +38,7 @@ export const AuthNav: React.FC<AuthNavProps> = ({ title, action }) => {
             pressed: { opacity: 0.7 },
           }}
         >
-          <Text fontSize="md" color="foreground">
+          <Text fontWeight="bold" fontSize="md" color="foreground">
             {action.label}
           </Text>
         </Touchable>

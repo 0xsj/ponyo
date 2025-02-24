@@ -45,7 +45,7 @@ export default function AuthScreen() {
     <SafeAreaView flex={1} bg="background">
       <Box flex={1} px="md" pt="lg">
         <Box mb="xl">
-          <Text fontSize="xl" fontWeight="bold" color="primary" mb="sm">
+          <Text fontSize="xxl" fontWeight="bold" color="primary" mb="sm">
             Hello World
           </Text>
           <Text fontSize="md" color="foreground" mb="sm">

@@ -47,7 +47,7 @@ export default function Login() {
       >
         <AuthNav
           action={{
-            label: "sign up",
+            label: "Sign up",
             onPress: () => router.push("/(auth)/sign-up"),
           }}
         />
@@ -88,8 +88,9 @@ export default function Login() {
             bg="foreground"
             p="md"
             borderRadius="lg"
+            mb={20}
           >
-            <Text align="center" color="background">
+            <Text fontWeight="semibold" align="center" color="background">
               {isLoading ? "Logging in..." : "Log in"}
             </Text>
           </Touchable>

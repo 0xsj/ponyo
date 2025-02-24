@@ -71,30 +71,34 @@ export default function SignUpScreen() {
               </Touchable>
             </Box>
 
-            <TextInput
-              color="foreground"
-              value={password}
-              onChangeText={setPassword}
-              placeholder="Create password"
-              placeholderColor="muted"
-              secureTextEntry
-              bg="surface"
-              p="md"
-              borderRadius="md"
-              mb="md"
-            />
+            <Box>
+              <TextInput
+                color="foreground"
+                value={password}
+                onChangeText={setPassword}
+                placeholder="Create password"
+                placeholderColor="muted"
+                secureTextEntry
+                bg="surface"
+                p="md"
+                borderRadius="md"
+                mb="md"
+              />
+            </Box>
 
-            <TextInput
-              color="foreground"
-              value={verificationCode}
-              onChangeText={setVerificationCode}
-              placeholder="Enter verification code"
-              placeholderColor="muted"
-              keyboardType="number-pad"
-              bg="surface"
-              p="md"
-              borderRadius="md"
-            />
+            <Box>
+              <TextInput
+                color="foreground"
+                value={verificationCode}
+                onChangeText={setVerificationCode}
+                placeholder="Enter verification code"
+                placeholderColor="muted"
+                keyboardType="number-pad"
+                bg="surface"
+                p="md"
+                borderRadius="md"
+              />
+            </Box>
           </Box>
 
           <Touchable
@@ -103,8 +107,9 @@ export default function SignUpScreen() {
             bg="foreground"
             p="md"
             borderRadius="lg"
+            mb={20}
           >
-            <Text align="center" color="background">
+            <Text fontWeight="semibold" align="center" color="background">
               Create account
             </Text>
           </Touchable>
