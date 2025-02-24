@@ -25,9 +25,7 @@ export const AuthNav: React.FC<AuthNavProps> = ({ title, action }) => {
         {/* <Text fontSize="md" color="foreground">
           ←
         </Text> */}
-        <Icon
-          name={'chevron-left'}
-        />
+        <Icon name={"chevron-left"} />
       </Touchable>
 
       <Text fontSize="md" color="foreground">

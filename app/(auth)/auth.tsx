@@ -5,7 +5,7 @@ import { Text } from "@/components/ui/text";
 import { Touchable } from "@/components/ui/touchable";
 import { router } from "expo-router";
 import { ButtonIcon, Icon } from "@/components/icon";
-import { Alert, Linking } from 'react-native';
+import { Alert, Linking } from "react-native";
 
 const SOCIAL_BUTTONS: Array<{
   id: string;
@@ -58,7 +58,7 @@ export default function AuthScreen() {
       [
         {
           text: "Cancel",
-          style: "cancel"
+          style: "cancel",
         },
         {
           text: "Continue",
@@ -67,9 +67,9 @@ export default function AuthScreen() {
               console.log(`Opening auth for ${provider}`);
               // Linking.openURL(authUrl);
             }
-          }
-        }
-      ]
+          },
+        },
+      ],
     );
   };
 
@@ -118,7 +118,9 @@ export default function AuthScreen() {
             p={"md"}
             mx="md"
             borderRadius="md"
-            onPress={() => handleSocialAuth("apple", "https://your-auth-url.com/apple")}
+            onPress={() =>
+              handleSocialAuth("apple", "https://your-auth-url.com/apple")
+            }
             pressableStyle={{
               pressed: { opacity: 0.7 },
             }}
