@@ -4,7 +4,11 @@ import { Text } from "@/components/ui/text";
 import { Touchable } from "@/components/ui/touchable";
 
 export default function HomeScreen() {
-  const { session, signOut } = useAuth();
+  const { session, signOut, isLoading } = useAuth();
+
+  if (isLoading || !session) {
+    return null;
+  }
 
   const handleSignOut = async () => {
     const result = await signOut();

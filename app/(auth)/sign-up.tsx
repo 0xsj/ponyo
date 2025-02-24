@@ -68,10 +68,7 @@ export default function SignUpScreen() {
                 onPress={handleSendVerification}
                 disabled={!email || isLoading}
               >
-                <Icon
-                  name="arrow-right-circle"
-                  color="muted"
-                />
+                <Icon name="arrow-right-circle" color="muted" />
               </Touchable>
             </Box>
 
