@@ -63,7 +63,7 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
-        name="chat"
+        name="chat/index"
         options={{
           title: "Chat",
           tabBarShowLabel: false,

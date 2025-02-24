@@ -34,7 +34,7 @@ export default function HomeScreen() {
             },
           }}
         >
-          <Text color="background" size={16}>
+          <Text color="background" fontSize="sm">
             Sign Out
           </Text>
         </Touchable>

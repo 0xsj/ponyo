@@ -9,7 +9,6 @@ import {
   AuthUser,
   OAuthProvider,
 } from "./auth.entity";
-import { QueryError } from "@/lib/errors/query-error";
 
 export interface IAuth<E extends Error> {
   // Core auth flows
@@ -32,9 +31,6 @@ export interface IAuth<E extends Error> {
   // Password management
   resetPassword(identifier: string): Promise<Result<void, E>>;
   updatePassword(newSecret: string): Promise<Result<void, E>>;
-
-  // Event handling
-  // onAuthStateChange(callback: (payload: AuthEventPayload) => void): () => void;
 
   // Lifecycle
   initialize(): Promise<void>;

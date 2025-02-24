@@ -8,7 +8,6 @@ import {
   AuthUser,
   OAuthProvider,
 } from "../domain/auth.entity";
-import { QueryError } from "@/lib/errors/query-error";
 import { Result } from "@/lib/shared/result";
 import { ServiceError } from "@/lib/errors/service-error";
 
@@ -89,10 +88,6 @@ export class AuthQueries {
   async updatePassword(newSecret: string) {
     return this.authService.updatePassword(newSecret);
   }
-
-  // onAuthStateChange(callback: (payload: AuthEventPayload) => void) {
-  //   return this.authService.onAuthStateChange(callback);
-  // }
 
   async initialize() {
     return this.authService.initialize();

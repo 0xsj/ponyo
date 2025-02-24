@@ -1,16 +1,13 @@
 // app/(auth)/login.tsx
 import { useState } from "react";
-import {
-  View,
-  TextInput,
-  TouchableOpacity,
-  Text,
-  StyleSheet,
-} from "react-native";
-import { useDebugStorage } from "@/hooks/useDebugStore";
 import { AuthCredentials } from "@/api/auth/domain/auth.entity";
 import { useAuth } from "@/hooks/useAuth";
-import { useRouter } from "expo-router";
+import { TextInput } from "@/components/ui/text-input";
+import { Text } from "@/components/ui/text";
+import { SafeAreaView } from "@/components/ui/safe-area-view";
+import { Box } from "@/components/ui/box";
+import { AuthNav } from "@/components/auth-nav";
+import { router } from "expo-router";
 
 export default function Login() {
   const [email, setEmail] = useState<string>("");
@@ -40,83 +37,18 @@ export default function Login() {
   };
 
   return (
-    <View style={styles.container}>
-      {error && <Text style={styles.error}>{error}</Text>}
-
-      <TextInput
-        style={styles.input}
-        placeholder="Email"
-        value={email}
-        onChangeText={(text) => {
-          setEmail(text);
-          setError(null);
+    <SafeAreaView flex={1} bg="background">
+      <AuthNav
+        action={{
+          label: "sign up",
+          onPress: () => router.push("/(auth)/sign-up"),
         }}
-        autoCapitalize="none"
-        keyboardType="email-address"
-        // editable={!isLoading}
       />
-
-      <TextInput
-        style={styles.input}
-        placeholder="Password"
-        value={password}
-        onChangeText={(text) => {
-          setPassword(text);
-          setError(null);
-        }}
-        secureTextEntry
-        // editable={!isLoading}
-      />
-
-      <TouchableOpacity
-        style={[
-          styles.button,
-          // (!isValid || isLoading) && styles.buttonDisabled
-        ]}
-        onPress={handleLogin}
-        // disabled={!isValid || isLoading}
-      >
-        <Text style={styles.buttonText}>
-          {/* {isLoading ? "Logging in..." : "Login"} */}
+      <Box flex={1} justify="center" align="center">
+        <Text fontSize="lg" color="foreground">
+          Login
         </Text>
-      </TouchableOpacity>
-    </View>
+      </Box>
+    </SafeAreaView>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: "center",
-    padding: 20,
-  },
-  input: {
-    height: 50,
-    borderWidth: 1,
-    borderColor: "#ddd",
-    borderRadius: 8,
-    paddingHorizontal: 15,
-    marginBottom: 15,
-    backgroundColor: "white",
-  },
-  button: {
-    height: 50,
-    backgroundColor: "#007AFF",
-    justifyContent: "center",
-    alignItems: "center",
-    borderRadius: 8,
-  },
-  buttonDisabled: {
-    backgroundColor: "#007AFF80",
-  },
-  buttonText: {
-    color: "white",
-    fontSize: 16,
-    fontWeight: "600",
-  },
-  error: {
-    color: "red",
-    marginBottom: 15,
-    textAlign: "center",
-  },
-});
