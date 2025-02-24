@@ -5,18 +5,22 @@ import { Text } from "@/components/ui/text";
 import { Touchable } from "@/components/ui/touchable";
 import { router } from "expo-router";
 import { ButtonIcon, Icon } from "@/components/icon";
+import { Alert, Linking } from 'react-native';
 
 const SOCIAL_BUTTONS: Array<{
   id: string;
   icon: ButtonIcon;
+  authUrl?: string;
 }> = [
   {
     id: "google",
     icon: { name: "google", iconSet: "fontawesome" },
+    authUrl: "https://your-auth-url.com/google",
   },
   {
     id: "facebook",
     icon: { name: "facebook", iconSet: "fontawesome" },
+    authUrl: "https://your-auth-url.com/facebook",
   },
   {
     id: "email",
@@ -25,6 +29,7 @@ const SOCIAL_BUTTONS: Array<{
   {
     id: "discord",
     icon: { name: "discord", iconSet: "fontawesome" },
+    authUrl: "https://your-auth-url.com/discord",
   },
   {
     id: "more",
@@ -41,6 +46,33 @@ const LANGUAGE_EXAMPLES = [
 ];
 
 export default function AuthScreen() {
+  const handleSocialAuth = (provider: string, authUrl?: string) => {
+    if (provider === "email") {
+      router.push("/(auth)/sign-up");
+      return;
+    }
+
+    Alert.alert(
+      `Sign in with ${provider}`,
+      `Would you like to continue signing in with ${provider}?`,
+      [
+        {
+          text: "Cancel",
+          style: "cancel"
+        },
+        {
+          text: "Continue",
+          onPress: () => {
+            if (authUrl) {
+              console.log(`Opening auth for ${provider}`);
+              // Linking.openURL(authUrl);
+            }
+          }
+        }
+      ]
+    );
+  };
+
   return (
     <SafeAreaView flex={1} bg="background">
       <Box flex={1} px="md" pt="lg">
@@ -86,6 +118,7 @@ export default function AuthScreen() {
             p={"md"}
             mx="md"
             borderRadius="md"
+            onPress={() => handleSocialAuth("apple", "https://your-auth-url.com/apple")}
             pressableStyle={{
               pressed: { opacity: 0.7 },
             }}
@@ -115,9 +148,7 @@ export default function AuthScreen() {
                 p="md"
                 mx="sm"
                 borderRadius="md"
-                onPress={() =>
-                  button.id === "email" && router.push("/(auth)/sign-up")
-                }
+                onPress={() => handleSocialAuth(button.id, button.authUrl)}
                 pressableStyle={{
                   pressed: { opacity: 0.7 },
                 }}
