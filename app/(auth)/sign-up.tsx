@@ -7,6 +7,7 @@ import { Touchable } from "@/components/ui/touchable";
 import { router } from "expo-router";
 import { TextInput } from "@/components/ui/text-input";
 import { KeyboardAvoidingView, Platform } from "react-native";
+import { Icon } from "@/components/icon";
 
 export default function SignUpScreen() {
   const [email, setEmail] = useState<string>("");
@@ -67,7 +68,10 @@ export default function SignUpScreen() {
                 onPress={handleSendVerification}
                 disabled={!email || isLoading}
               >
-                <Text color="primary">→</Text>
+                <Icon
+                  name="arrow-right-circle"
+                  color="muted"
+                />
               </Touchable>
             </Box>
 
