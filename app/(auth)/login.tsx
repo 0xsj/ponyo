@@ -58,6 +58,7 @@ export default function Login() {
               Log in
             </Text>
             <TextInput
+              color="foreground"
               value={email}
               onChangeText={setEmail}
               placeholder="Enter your email"
@@ -70,6 +71,7 @@ export default function Login() {
               mb="md"
             />
             <TextInput
+              color="foreground"
               value={password}
               onChangeText={setPassword}
               placeholder="Enter your password"

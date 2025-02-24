@@ -35,7 +35,7 @@ export default function SignUpScreen() {
       >
         <AuthNav
           action={{
-            label: "login",
+            label: "Login",
             onPress: () => router.push("/(auth)/login"),
           }}
         />
@@ -47,6 +47,7 @@ export default function SignUpScreen() {
 
             <Box style={{ position: "relative" }} mb="md">
               <TextInput
+                color="foreground"
                 value={email}
                 onChangeText={setEmail}
                 placeholder="Enter your email"
@@ -71,6 +72,7 @@ export default function SignUpScreen() {
             </Box>
 
             <TextInput
+              color="foreground"
               value={password}
               onChangeText={setPassword}
               placeholder="Create password"
@@ -83,6 +85,7 @@ export default function SignUpScreen() {
             />
 
             <TextInput
+              color="foreground"
               value={verificationCode}
               onChangeText={setVerificationCode}
               placeholder="Enter verification code"
