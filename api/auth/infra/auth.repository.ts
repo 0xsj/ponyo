@@ -180,22 +180,6 @@ export class AuthRepository implements IAuth<RepositoryError> {
   updatePassword(newSecret: string): Promise<Result<void, RepositoryError>> {
     throw new Error("Method not implemented.");
   }
-  // onAuthStateChange(callback: (payload: AuthEventPayload) => void): () => void {
-  //   const { data: { subscription } } = this.supabase.auth.onAuthStateChange(
-  //     (event, session) => {
-  //       const payload: AuthEventPayload = {
-  //         type: event as AuthEventType,
-  //         session: session ? AuthMapper.toAuthSession(session).unwrapOr(null) : null,
-  //         user: session?.user ? AuthMapper.toAuthUser(session.user).unwrapOr(null) : null,
-  //       };
-  //       callback(payload);
-  //     }
-  //   );
-
-  //   return () => {
-  //     subscription?.unsubscribe();
-  //   };
-  // }
 
   initialize(): Promise<void> {
     throw new Error("Method not implemented.");

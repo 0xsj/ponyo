@@ -192,9 +192,6 @@ export class AuthService implements IAuth<ServiceError> {
   updatePassword(newSecret: string): Promise<Result<void, ServiceError>> {
     throw new Error("Method not implemented.");
   }
-  // onAuthStateChange(callback: (payload: AuthEventPayload) => void): () => void {
-  //   return this.authRepository.onAuthStateChange(callback);
-  // }
 
   initialize(): Promise<void> {
     throw new Error("Method not implemented.");

@@ -5,12 +5,18 @@ import {
   TextStyle,
   StyleProp,
 } from "react-native";
-import { ColorKeys, StyleTokens } from "@/theme/theme";
+import {
+  ColorKeys,
+  StyleTokens,
+  FontSizeKeys,
+  FontWeightKeys,
+  theme,
+} from "@/theme/theme";
 import { useStyleTokens } from "@/theme/utils";
 
 interface TextTokens extends StyleTokens {
-  size?: number;
-  weight?: "400" | "500" | "600" | "700" | "bold";
+  fontSize?: FontSizeKeys;
+  fontWeight?: FontWeightKeys;
   color?: ColorKeys;
   align?: "left" | "center" | "right" | "justify";
 }
@@ -21,7 +27,7 @@ export type TextProps = Omit<RNTextProps, "style"> &
   };
 
 export const Text = React.forwardRef<RNText, TextProps>((props, ref) => {
-  const { style, size, weight, color, align, ...rest } = props;
+  const { style, fontSize, fontWeight, color, align, ...rest } = props;
   const baseStyles = useStyleTokens({ ...rest, color }) as TextStyle;
 
   return (
@@ -29,8 +35,12 @@ export const Text = React.forwardRef<RNText, TextProps>((props, ref) => {
       ref={ref}
       style={[
         baseStyles,
-        size !== undefined && { fontSize: size },
-        weight !== undefined && { fontWeight: weight },
+        fontSize !== undefined && {
+          fontSize: theme.typography.sizes[fontSize],
+        },
+        fontWeight !== undefined && {
+          fontWeight: theme.typography.weights[fontWeight],
+        },
         align !== undefined && { textAlign: align },
         style,
       ]}

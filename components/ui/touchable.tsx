@@ -15,7 +15,6 @@ interface PressableStyleState {
   pressed: boolean;
 }
 
-// Define a type for the pressable style object
 interface PressableStyleObject {
   pressed?: StyleProp<ViewStyle>;
   default?: StyleProp<ViewStyle>;
