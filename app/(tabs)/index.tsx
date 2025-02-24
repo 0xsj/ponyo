@@ -4,13 +4,16 @@ import { Text } from "@/components/ui/text";
 import { Touchable } from "@/components/ui/touchable";
 
 export default function HomeScreen() {
-  const { session, signOut } = useAuth();
+  const { session, signOut, isLoading } = useAuth();
+
+  if (isLoading || !session) {
+    return null;
+  }
 
   const handleSignOut = async () => {
     const result = await signOut();
     if (result.isOk()) {
       console.log("signing out");
-      console.log(session);
     } else {
       console.error("sign out failed", result.unwrapErr());
     }

@@ -4,13 +4,37 @@ import { SafeAreaView } from "@/components/ui/safe-area-view";
 import { Text } from "@/components/ui/text";
 import { Touchable } from "@/components/ui/touchable";
 import { router } from "expo-router";
+import { ButtonIcon, Icon } from "@/components/icon";
+import { Alert, Linking } from 'react-native';
 
-const SOCIAL_BUTTONS = [
-  { id: "google", label: "G" },
-  { id: "facebook", label: "F" },
-  { id: "email", label: "@" },
-  { id: "kakao", label: "K" },
-  { id: "other", label: "..." },
+const SOCIAL_BUTTONS: Array<{
+  id: string;
+  icon: ButtonIcon;
+  authUrl?: string;
+}> = [
+  {
+    id: "google",
+    icon: { name: "google", iconSet: "fontawesome" },
+    authUrl: "https://your-auth-url.com/google",
+  },
+  {
+    id: "facebook",
+    icon: { name: "facebook", iconSet: "fontawesome" },
+    authUrl: "https://your-auth-url.com/facebook",
+  },
+  {
+    id: "email",
+    icon: { name: "mail", iconSet: "feather" },
+  },
+  {
+    id: "discord",
+    icon: { name: "discord", iconSet: "fontawesome" },
+    authUrl: "https://your-auth-url.com/discord",
+  },
+  {
+    id: "more",
+    icon: { name: "more-horizontal", iconSet: "feather" },
+  },
 ];
 
 const LANGUAGE_EXAMPLES = [
@@ -22,11 +46,38 @@ const LANGUAGE_EXAMPLES = [
 ];
 
 export default function AuthScreen() {
+  const handleSocialAuth = (provider: string, authUrl?: string) => {
+    if (provider === "email") {
+      router.push("/(auth)/sign-up");
+      return;
+    }
+
+    Alert.alert(
+      `Sign in with ${provider}`,
+      `Would you like to continue signing in with ${provider}?`,
+      [
+        {
+          text: "Cancel",
+          style: "cancel"
+        },
+        {
+          text: "Continue",
+          onPress: () => {
+            if (authUrl) {
+              console.log(`Opening auth for ${provider}`);
+              // Linking.openURL(authUrl);
+            }
+          }
+        }
+      ]
+    );
+  };
+
   return (
     <SafeAreaView flex={1} bg="background">
       <Box flex={1} px="md" pt="lg">
         <Box mb="xl">
-          <Text fontSize="xl" fontWeight="bold" color="primary" mb="sm">
+          <Text fontSize="xxl" fontWeight="bold" color="primary" mb="sm">
             Hello World
           </Text>
           <Text fontSize="md" color="foreground" mb="sm">
@@ -58,13 +109,27 @@ export default function AuthScreen() {
 
         <Box mb="lg">
           <Touchable
+            style={{
+              flexDirection: "row",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
             bg="surface"
-            py="md"
+            p={"md"}
+            mx="md"
             borderRadius="md"
+            onPress={() => handleSocialAuth("apple", "https://your-auth-url.com/apple")}
             pressableStyle={{
               pressed: { opacity: 0.7 },
             }}
           >
+            <Icon
+              name="apple"
+              iconSet="fontawesome"
+              color="foreground"
+              size={24}
+              style={{ marginRight: 8 }}
+            />
             <Text
               fontSize="md"
               fontWeight="medium"
@@ -80,19 +145,20 @@ export default function AuthScreen() {
               <Touchable
                 key={button.id}
                 bg="surface"
-                p="lg"
-                mx={"sm"}
+                p="md"
+                mx="sm"
                 borderRadius="md"
-                onPress={() =>
-                  button.id === "email" && router.push("/(auth)/sign-up")
-                }
+                onPress={() => handleSocialAuth(button.id, button.authUrl)}
                 pressableStyle={{
                   pressed: { opacity: 0.7 },
                 }}
               >
-                <Text fontSize="md" color="foreground">
-                  {button.label}
-                </Text>
+                <Icon
+                  name={button.icon.name}
+                  iconSet={button.icon.iconSet}
+                  size={24}
+                  color="foreground"
+                />
               </Touchable>
             ))}
           </Box>

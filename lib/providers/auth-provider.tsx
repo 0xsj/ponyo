@@ -1,23 +1,35 @@
 import { getAuthStore } from "@/store/auth.store";
 import { useRouter, useSegments } from "expo-router";
 import React from "react";
-import { PropsWithChildren, useEffect } from "react";
+import { PropsWithChildren, useEffect, useState } from "react";
+import { View, Text, ActivityIndicator } from "react-native";
 import { authClient } from "@/lib/supabase/auth-client";
+import { LoadingScreen } from "@/components/loader";
 
 export function AuthProvider({ children }: PropsWithChildren) {
   const router = useRouter();
   const segments = useSegments();
   const store = getAuthStore();
   const isAuthenticated = store((state) => state.isAuthenticated);
+  const [isInitializing, setIsInitializing] = useState(true);
 
   useEffect(() => {
     const initAuth = async () => {
-      const result = await authClient.getSession();
-      if (result.isOk()) {
-        const session = result.unwrap();
-        if (session) {
-          store.getState().setSession(session);
+      try {
+        // Start both the auth check and the timer
+        const [authResult] = await Promise.all([
+          authClient.getSession(),
+          new Promise((resolve) => setTimeout(resolve, 1000)), // 3 second minimum
+        ]);
+
+        if (authResult.isOk()) {
+          const session = authResult.unwrap();
+          if (session) {
+            store.getState().setSession(session);
+          }
         }
+      } finally {
+        setIsInitializing(false);
       }
     };
 
@@ -34,14 +46,19 @@ export function AuthProvider({ children }: PropsWithChildren) {
   }, []);
 
   useEffect(() => {
-    const inAuthGroup = segments[0] === "(auth)";
+    if (isInitializing) return;
 
+    const inAuthGroup = segments[0] === "(auth)";
     if (!isAuthenticated && !inAuthGroup) {
       router.replace("/(auth)/auth");
     } else if (isAuthenticated && inAuthGroup) {
       router.replace("/(tabs)");
     }
-  }, [isAuthenticated, segments]);
+  }, [isAuthenticated, segments, isInitializing]);
+
+  if (isInitializing) {
+    return <LoadingScreen />;
+  }
 
   return <>{children}</>;
 }

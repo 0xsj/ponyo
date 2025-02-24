@@ -2,6 +2,7 @@ import { Box } from "./ui/box";
 import { Touchable } from "./ui/touchable";
 import { Text } from "./ui/text";
 import { router } from "expo-router";
+import { Icon } from "./icon";
 
 interface AuthNavProps {
   title?: string;
@@ -21,9 +22,12 @@ export const AuthNav: React.FC<AuthNavProps> = ({ title, action }) => {
           pressed: { opacity: 0.7 },
         }}
       >
-        <Text fontSize="md" color="foreground">
+        {/* <Text fontSize="md" color="foreground">
           ←
-        </Text>
+        </Text> */}
+        <Icon
+          name={'chevron-left'}
+        />
       </Touchable>
 
       <Text fontSize="md" color="foreground">
@@ -38,7 +42,7 @@ export const AuthNav: React.FC<AuthNavProps> = ({ title, action }) => {
             pressed: { opacity: 0.7 },
           }}
         >
-          <Text fontSize="md" color="foreground">
+          <Text fontWeight="bold" fontSize="md" color="foreground">
             {action.label}
           </Text>
         </Touchable>

@@ -8,6 +8,8 @@ import { SafeAreaView } from "@/components/ui/safe-area-view";
 import { Box } from "@/components/ui/box";
 import { AuthNav } from "@/components/auth-nav";
 import { router } from "expo-router";
+import { Touchable } from "@/components/ui/touchable";
+import { KeyboardAvoidingView, Platform } from "react-native";
 
 export default function Login() {
   const [email, setEmail] = useState<string>("");
@@ -16,6 +18,7 @@ export default function Login() {
   const { signIn, isLoading } = useAuth();
 
   const handleLogin = async () => {
+    setError(null);
     if (!email || !password) {
       setError("please enter email and password");
       return;
@@ -38,17 +41,61 @@ export default function Login() {
 
   return (
     <SafeAreaView flex={1} bg="background">
-      <AuthNav
-        action={{
-          label: "sign up",
-          onPress: () => router.push("/(auth)/sign-up"),
-        }}
-      />
-      <Box flex={1} justify="center" align="center">
-        <Text fontSize="lg" color="foreground">
-          Login
-        </Text>
-      </Box>
+      <KeyboardAvoidingView
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
+        style={{ flex: 1 }}
+      >
+        <AuthNav
+          action={{
+            label: "Sign up",
+            onPress: () => router.push("/(auth)/sign-up"),
+          }}
+        />
+
+        <Box flex={1} justify="space-between" px="lg">
+          <Box mb="lg">
+            <Text color="foreground" fontWeight="bold" fontSize="lg" my={30}>
+              Log in
+            </Text>
+            <TextInput
+              color="foreground"
+              value={email}
+              onChangeText={setEmail}
+              placeholder="Enter your email"
+              placeholderColor="muted"
+              autoCapitalize="none"
+              keyboardType="email-address"
+              bg="surface"
+              p="md"
+              borderRadius="md"
+              mb="md"
+            />
+            <TextInput
+              color="foreground"
+              value={password}
+              onChangeText={setPassword}
+              placeholder="Enter your password"
+              placeholderColor="muted"
+              secureTextEntry
+              bg="surface"
+              p="md"
+              borderRadius="md"
+            />
+          </Box>
+          <Touchable
+            onPress={handleLogin}
+            disabled={isLoading}
+            bg="foreground"
+            p="md"
+            borderRadius="lg"
+            mb={20}
+          >
+            <Text fontWeight="semibold" align="center" color="background">
+              {isLoading ? "Logging in..." : "Log in"}
+            </Text>
+          </Touchable>
+        </Box>
+      </KeyboardAvoidingView>
     </SafeAreaView>
   );
 }
