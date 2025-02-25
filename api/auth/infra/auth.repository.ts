@@ -7,6 +7,7 @@ import {
   AuthEventType,
   AuthSession,
   AuthUser,
+  EmailVerificationSubmit,
   OAuthProvider,
 } from "../domain/auth.entity";
 import { RepositoryError } from "@/lib/errors/repository-error";
@@ -19,7 +20,7 @@ export class AuthRepository implements IAuth<RepositoryError> {
   constructor(private readonly supabase: TypedSupabaseClient) {}
 
   private handleSessionResult(
-    sessionResult: Result<AuthSession, ValidationError>,
+    sessionResult: Result<AuthSession | null, ValidationError>,
     type: string,
   ): Result<AuthSession, RepositoryError> {
     if (sessionResult.isErr()) {
@@ -29,7 +30,15 @@ export class AuthRepository implements IAuth<RepositoryError> {
         }),
       );
     }
-    return Result.Ok(sessionResult.unwrap());
+
+    const session = sessionResult.unwrap();
+    if (!session) {
+      return Result.Err(
+        RepositoryError.invalidSession(`${type} session is null`),
+      );
+    }
+
+    return Result.Ok(session);
   }
 
   async signIn(
@@ -127,10 +136,44 @@ export class AuthRepository implements IAuth<RepositoryError> {
     }
   }
 
-  signUp(
+  async signUp(
     credentials: AuthCredentials,
   ): Promise<Result<AuthSession, RepositoryError>> {
-    throw new Error("Method not implemented.");
+    try {
+      if (!credentials.identifier || !credentials.secret) {
+        return Result.Err(
+          RepositoryError.validationFailed(
+            "Email and password are required for signup",
+          ),
+        );
+      }
+
+      const { data, error } = await this.supabase.auth.signUp({
+        email: credentials.identifier,
+        password: credentials.secret,
+        options: {
+          emailRedirectTo: undefined,
+        },
+      });
+
+      if (error) {
+        if (error.message.includes("already registered")) {
+          return Result.Err(RepositoryError.uniqueViolation("User", "email"));
+        }
+        return Result.Err(
+          RepositoryError.queryFailed("Signup failed", { details: error }),
+        );
+      }
+
+      await this.requestEmailVerification(credentials.identifier);
+
+      const sessionResult = AuthMapper.toAuthSession(data.session);
+      return this.handleSessionResult(sessionResult, "signup");
+    } catch (error) {
+      return Result.Err(
+        RepositoryError.connectionFailed("Signup failed", { error }),
+      );
+    }
   }
   async signOut(): Promise<Result<void, RepositoryError>> {
     try {
@@ -148,6 +191,81 @@ export class AuthRepository implements IAuth<RepositoryError> {
     } catch (error) {
       return Result.Err(
         RepositoryError.connectionFailed("Sign out failed", { error }),
+      );
+    }
+  }
+
+  async requestEmailVerification(
+    email: string,
+  ): Promise<Result<void, RepositoryError>> {
+    try {
+      const { error } = await this.supabase.auth.signInWithOtp({
+        email,
+        options: {
+          shouldCreateUser: true,
+        },
+      });
+      if (error) {
+        return Result.Err(
+          RepositoryError.queryFailed("Failed to send verification code", {
+            details: error,
+          }),
+        );
+      }
+      return Result.Ok(void 0);
+    } catch (error) {
+      return Result.Err(
+        RepositoryError.connectionFailed("Verification request failed", {
+          error,
+        }),
+      );
+    }
+  }
+
+  async verifyEmail(
+    data: EmailVerificationSubmit,
+  ): Promise<Result<AuthSession, RepositoryError>> {
+    try {
+      const { data: authData, error } = await this.supabase.auth.verifyOtp({
+        email: data.email,
+        token: data.code,
+        type: "email",
+      });
+
+      if (error) {
+        return Result.Err(
+          RepositoryError.queryFailed(
+            "No session returned after verification",
+            {
+              details: error,
+            },
+          ),
+        );
+      }
+
+      if (!authData.session) {
+        return Result.Err(
+          RepositoryError.queryFailed("No session returned after verification"),
+        );
+      }
+
+      const sessionResult = AuthMapper.toAuthSession(authData.session);
+
+      if (sessionResult.isOk() && sessionResult.unwrap() === null) {
+        return Result.Err(
+          RepositoryError.invalidSession("Email verification session is null"),
+        );
+      }
+
+      return this.handleSessionResult(
+        sessionResult as Result<AuthSession, ValidationError>,
+        "email verification",
+      );
+    } catch (error) {
+      return Result.Err(
+        RepositoryError.connectionFailed("Email verification failed", {
+          error,
+        }),
       );
     }
   }

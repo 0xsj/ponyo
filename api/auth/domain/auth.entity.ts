@@ -53,6 +53,23 @@ export const authCredentialsSchema = z.object({
   session: sessionContextSchema,
 });
 
+export const verificationCodeSchema = z.object({
+  code: z.string(),
+  identifier: z.string().email(),
+  expiresAt: z.number(),
+  verifiedAt: z.number().nullable().optional(),
+  attempts: z.number().default(0),
+});
+
+export const emailVerificationRequestSchema = z.object({
+  email: z.string().email(),
+});
+
+export const emailVerificationSubmitSchema = z.object({
+  email: z.string().email(),
+  code: z.string(),
+});
+
 export const oauthProviderSchema = z.enum(["google", "facebook", "apple"]);
 
 export const authEventTypeSchema = z.enum([
@@ -67,6 +84,13 @@ export type AuthSession = z.infer<typeof authSessionSchema>;
 export type AuthCredentials = z.infer<typeof authCredentialsSchema>;
 export type OAuthProvider = z.infer<typeof oauthProviderSchema>;
 export type AuthEventType = z.infer<typeof authEventTypeSchema>;
+export type VerificationCode = z.infer<typeof verificationCodeSchema>;
+export type EmailVerificationRequest = z.infer<
+  typeof emailVerificationRequestSchema
+>;
+export type EmailVerificationSubmit = z.infer<
+  typeof emailVerificationSubmitSchema
+>;
 
 export interface AuthEventPayload {
   type: AuthEventType;

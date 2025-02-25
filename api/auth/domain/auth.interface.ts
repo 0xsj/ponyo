@@ -7,6 +7,7 @@ import {
   AuthEventPayload,
   AuthSession,
   AuthUser,
+  EmailVerificationSubmit,
   OAuthProvider,
 } from "./auth.entity";
 
@@ -15,6 +16,10 @@ export interface IAuth<E extends Error> {
   signIn(credentials: AuthCredentials): Promise<Result<AuthSession, E>>;
   signUp(credentials: AuthCredentials): Promise<Result<AuthSession, E>>;
   signOut(): Promise<Result<void, E>>;
+
+  // email verification
+  requestEmailVerification(email: string): Promise<Result<void, E>>;
+  verifyEmail(data: EmailVerificationSubmit): Promise<Result<AuthSession, E>>;
 
   // Session management
   getSession(): Promise<Result<AuthSession, E>>;
