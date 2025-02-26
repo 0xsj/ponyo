@@ -1,7 +1,7 @@
 // app/(auth)/login.tsx
 import { useState } from "react";
 import { AuthCredentials } from "@/api/auth/domain/auth.entity";
-import { useAuth } from "@/hooks/useAuth";
+// import { useAuth } from "@/hooks/useAuth";
 import { TextInput } from "@/components/ui/text-input";
 import { Text } from "@/components/ui/text";
 import { SafeAreaView } from "@/components/ui/safe-area-view";
@@ -15,25 +15,9 @@ export default function Login() {
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const [error, setError] = useState<string | null>(null);
-  const { signIn, isLoading } = useAuth();
+  // const { signIn, isLoading } = useAuth();
 
-  const handleLogin = async () => {
-    setError(null);
-    if (!email || !password) {
-      setError("please enter email and password");
-      return;
-    }
-    const credentials: AuthCredentials = {
-      identifier: email,
-      secret: password,
-    };
-    const result = await signIn(credentials);
-    if (result.isErr()) {
-      const error = result.unwrapErr();
-      setError(error.message);
-      return;
-    }
-  };
+  const handleLogin = async () => {};
 
   return (
     <SafeAreaView flex={1} bg="background">
@@ -80,14 +64,14 @@ export default function Login() {
           </Box>
           <Touchable
             onPress={handleLogin}
-            disabled={isLoading}
+            // disabled={isLoading}
             bg="foreground"
             p="md"
             borderRadius="lg"
             mb={20}
           >
             <Text fontWeight="semibold" align="center" color="background">
-              {isLoading ? "Logging in..." : "Log in"}
+              {/* {isLoading ? "Logging in..." : "Log in"} */}
             </Text>
           </Touchable>
         </Box>

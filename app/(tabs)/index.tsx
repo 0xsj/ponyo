@@ -1,22 +1,22 @@
-import { useAuth } from "@/hooks/useAuth";
+// import { useAuth } from "@/hooks/useAuth";
 import { Box } from "@/components/ui/box";
 import { Text } from "@/components/ui/text";
 import { Touchable } from "@/components/ui/touchable";
 
 export default function HomeScreen() {
-  const { session, signOut, isLoading } = useAuth();
+  // const { session, signOut, isLoading } = useAuth();
 
-  if (isLoading || !session) {
-    return null;
-  }
+  // if (isLoading || !session) {
+  //   return null;
+  // }
 
   const handleSignOut = async () => {
-    const result = await signOut();
-    if (result.isOk()) {
-      console.log("signing out");
-    } else {
-      console.error("sign out failed", result.unwrapErr());
-    }
+    // const result = await signOut();
+    // if (result.isOk()) {
+    //   console.log("signing out");
+    // } else {
+    //   console.error("sign out failed", result.unwrapErr());
+    // }
   };
 
   return (
