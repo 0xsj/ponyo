@@ -16,6 +16,8 @@ export default function TabLayout() {
   const { getUser, currentUser, isLoading } = useUser();
   const store = getUserStore();
 
+  useDebugStorage();
+
   return (
     <Tabs
       screenOptions={{

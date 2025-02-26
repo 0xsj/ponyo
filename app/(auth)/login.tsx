@@ -23,17 +23,13 @@ export default function Login() {
       setError("please enter email and password");
       return;
     }
-
     const credentials: AuthCredentials = {
       identifier: email,
       secret: password,
     };
-
     const result = await signIn(credentials);
-
     if (result.isErr()) {
       const error = result.unwrapErr();
-
       setError(error.message);
       return;
     }

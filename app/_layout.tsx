@@ -13,6 +13,8 @@ import { useColorScheme } from "@/hooks/useColorScheme";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ServiceProvider } from "@/lib/providers/service-provider";
 import { AuthProvider } from "@/lib/providers/auth-provider";
+import { getUserStore } from "@/store/user.store";
+import { getAuthStore } from "@/store/auth.store";
 
 SplashScreen.preventAutoHideAsync();
 
@@ -30,6 +32,8 @@ const queryClient = new QueryClient({
 export default function RootLayout() {
   const colorScheme = useColorScheme();
   const isFirstRender = useRef(true);
+  const userStore = getUserStore();
+  const authStore = getAuthStore();
 
   const [loaded] = useFonts({
     SpaceMono: require("../assets/fonts/SpaceMono-Regular.ttf"),

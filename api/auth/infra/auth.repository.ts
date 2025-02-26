@@ -41,101 +41,120 @@ export class AuthRepository implements IAuth<RepositoryError> {
     return Result.Ok(session);
   }
 
+
   async signIn(
     credentials: AuthCredentials,
   ): Promise<Result<AuthSession, RepositoryError>> {
     try {
-      const result = await match(credentials)
-        .with(
-          {
-            identifier: P.string,
-            secret: P.string,
-          },
-          async (creds) => {
-            const { data, error } = await this.supabase.auth.signInWithPassword(
-              {
-                email: creds.identifier,
-                password: creds.secret,
-              },
-            );
-            return { data, error, type: "password" as const };
-          },
-        )
-        .with(
-          {
-            oauth: {
-              accessToken: P.string,
-              provider: P.string,
-            },
-          },
-          async (creds) => {
-            const { data, error } = await this.supabase.auth.signInWithIdToken({
-              provider: creds.oauth!.provider as any,
-              token: creds.oauth!.accessToken,
-            });
-            return { data, error, type: "oauth" as const };
-          },
-        )
-        .with(
-          {
-            identifier: P.string,
-            mfa: {
-              code: P.string,
-            },
-          },
-          async (creds) => {
-            const { data, error } = await this.supabase.auth.verifyOtp({
-              email: creds.identifier,
-              token: creds.mfa!.code!,
-              type: "email",
-            });
-            return { data, error, type: "mfa" as const };
-          },
-        )
-        .otherwise(() => ({
-          data: null,
-          error: { message: "Invalid authentication method" },
-          type: "invalid" as const,
-        }));
-
-      if (result.error) {
+      if (!credentials.identifier || !credentials.secret) {
+        console.error("AuthRepository: Missing required credentials for sign in");
         return Result.Err(
-          RepositoryError.queryFailed(result.error.message, {
-            type: result.type,
-            details: result.error,
-          }),
+          RepositoryError.validationFailed("Email and password are required")
         );
       }
+      
+      console.log("AuthRepository: Attempting password sign in for:", credentials.identifier);
+      
+      const normalizedEmail = credentials.identifier.trim().toLowerCase();
+      
+      const { data, error } = await this.supabase.auth.signInWithPassword({
+        email: normalizedEmail,
+        password: credentials.secret,
+      });
 
-      const sessionResult = AuthMapper.toAuthSession(
-        result.data?.session ?? null,
-      );
+      console.log("Supabase sign-in raw response:", {
+        data: JSON.stringify(data),
+        error: error ? {
+          message: error.message,
+          status: error.status,
+          name: error.name,
+          details: error.details,
+          // Log any other fields available on the error
+        } : null
+      });
+      
+      console.log("AuthRepository: Sign in response:", {
+        hasData: !!data,
+        hasSession: !!data?.session,
+        hasUser: !!data?.user,
+        errorMessage: error ? error.message : null
+      });
+      
+      // Handle errors
+      if (error) {
+        console.error("AuthRepository: Sign in failed:", error.message);
+        
+        if (error.message.includes("Invalid login credentials")) {
+          return Result.Err(
+            RepositoryError.queryFailed("Invalid email or password", {
+              details: error,
+            })
+          );
+        }
+        
+        if (error.message.includes("Email not confirmed")) {
+          return Result.Err(
+            RepositoryError.queryFailed("Email not verified", {
+              details: error,
+            })
+          );
+        }
+        
+        return Result.Err(
+          RepositoryError.queryFailed(`Sign in failed: ${error.message}`, {
+            details: error,
+          })
+        );
+      }
+      
+      // Ensure we have a session
+      if (!data.session) {
+        console.error("AuthRepository: Sign in succeeded but no session returned");
+        return Result.Err(
+          RepositoryError.invalidSession("No session returned after sign in")
+        );
+      }
+      
+      console.log("AuthRepository: Sign in successful", {
+        userId: data.session.user.id,
+        email: data.session.user.email
+      });
+      
+      // Map the session to our domain model
+      const sessionResult = AuthMapper.toAuthSession(data.session);
+      
       if (sessionResult.isErr()) {
+        console.error("AuthRepository: Session mapping failed:", sessionResult.unwrapErr());
         return Result.Err(
-          RepositoryError.validationFailed(
-            `Failed to parse ${result.type} session`,
-            {
-              validation: sessionResult.unwrapErr(),
-            },
-          ),
+          RepositoryError.validationFailed("Failed to parse session", {
+            validation: sessionResult.unwrapErr(),
+          })
         );
       }
-
+      
       const session = sessionResult.unwrap();
       if (!session) {
+        console.error("AuthRepository: Session mapping returned null");
         return Result.Err(
-          RepositoryError.invalidSession("Session data is null or invalid"),
+          RepositoryError.invalidSession("Session mapping returned null")
         );
       }
-
+      
+      console.log("AuthRepository: Session mapped successfully");
       return Result.Ok(session);
     } catch (error) {
+      console.error("AuthRepository: Unexpected error during sign in:", error);
       return Result.Err(
-        RepositoryError.connectionFailed("Sign in failed", { error }),
+        RepositoryError.connectionFailed("Sign in failed due to an unexpected error", { 
+          error 
+        })
       );
     }
   }
 
+  
+  
+  
   async signUp(
     credentials: AuthCredentials,
   ): Promise<Result<AuthSession, RepositoryError>> {
@@ -150,7 +169,6 @@ export class AuthRepository implements IAuth<RepositoryError> {
         );
       }
 
-      // Sign up with Supabase - the email should already be verified at this point
       const { data, error } = await this.supabase.auth.signUp({
         email: credentials.identifier,
         password: credentials.secret,
@@ -158,6 +176,8 @@ export class AuthRepository implements IAuth<RepositoryError> {
           emailRedirectTo: undefined,
         },
       });
+
+      console.log('secret is:    ', credentials.secret),
 
       console.log("Supabase signUp response:", {
         hasData: !!data,
@@ -343,15 +363,116 @@ export class AuthRepository implements IAuth<RepositoryError> {
     }
   }
 
-  getSession(): Promise<Result<AuthSession, RepositoryError>> {
-    throw new Error("Method not implemented.");
+  async getSession(): Promise<Result<AuthSession, RepositoryError>> {
+    try {
+      console.log("AuthRepository: Retrieving current session");
+      
+      const { data, error } = await this.supabase.auth.getSession();
+      
+      if (error) {
+        console.error("AuthRepository: Error getting session:", error.message);
+        return Result.Err(
+          RepositoryError.queryFailed("Failed to get session", {
+            details: error,
+          }),
+        );
+      }
+      
+      if (!data.session) {
+        console.log("AuthRepository: No active session found");
+        return Result.Err(
+          RepositoryError.invalidSession("No active session found"),
+        );
+      }
+      
+      const sessionResult = AuthMapper.toAuthSession(data.session);
+      
+      console.log("AuthRepository: Session retrieved successfully", {
+        sessionExists: !!data.session,
+        mappingSuccessful: sessionResult.isOk(),
+      });
+      
+      return this.handleSessionResult(
+        sessionResult as Result<AuthSession, ValidationError>,
+        "current",
+      );
+    } catch (error) {
+      console.error("AuthRepository: Unexpected error getting session:", error);
+      return Result.Err(
+        RepositoryError.connectionFailed("Failed to get session", { error }),
+      );
+    }
   }
-  refreshSession(): Promise<Result<AuthSession, RepositoryError>> {
-    throw new Error("Method not implemented.");
+  async refreshSession(): Promise<Result<AuthSession, RepositoryError>> {
+    try {
+      console.log("AuthRepository: Refreshing session");
+      
+      const { data, error } = await this.supabase.auth.refreshSession();
+      
+      if (error) {
+        console.error("AuthRepository: Error refreshing session:", error.message);
+        return Result.Err(
+          RepositoryError.queryFailed("Failed to refresh session", {
+            details: error,
+          }),
+        );
+      }
+      
+      if (!data.session) {
+        console.log("AuthRepository: No session returned after refresh");
+        return Result.Err(
+          RepositoryError.invalidSession("No session returned after refresh"),
+        );
+      }
+      
+      const sessionResult = AuthMapper.toAuthSession(data.session);
+      
+      console.log("AuthRepository: Session refreshed successfully", {
+        hasNewSession: !!data.session,
+        mappingSuccessful: sessionResult.isOk(),
+      });
+      
+      return this.handleSessionResult(
+        sessionResult as Result<AuthSession, ValidationError>,
+        "refreshed",
+      );
+    } catch (error) {
+      console.error("AuthRepository: Unexpected error refreshing session:", error);
+      return Result.Err(
+        RepositoryError.connectionFailed("Failed to refresh session", { error }),
+      );
+    }
   }
-  isSessionValid(): Promise<boolean> {
-    throw new Error("Method not implemented.");
+
+  async isSessionValid(): Promise<boolean> {
+    try {
+      console.log("AuthRepository: Checking session validity");
+      
+      const { data, error } = await this.supabase.auth.getSession();
+      
+      if (error) {
+        console.error("AuthRepository: Error checking session validity:", error.message);
+        return false;
+      }
+      
+      const isValid = !!data.session && 
+                      !!data.session.access_token && 
+                      !!data.session.user;
+      
+      console.log("AuthRepository: Session validity check result:", {
+        hasSession: !!data.session,
+        hasAccessToken: !!data.session?.access_token,
+        hasUser: !!data.session?.user,
+        isValid,
+      });
+      
+      return isValid;
+    } catch (error) {
+      console.error("AuthRepository: Unexpected error checking session validity:", error);
+      return false;
+    }
   }
+
   getUser(): Promise<Result<AuthUser, RepositoryError>> {
     throw new Error("Method not implemented.");
   }

@@ -110,15 +110,45 @@ export class AuthService implements IAuth<ServiceError> {
   async signIn(
     credentials: AuthCredentials,
   ): Promise<Result<AuthSession, ServiceError>> {
+    console.log("AuthService: Signing in user:", credentials.identifier);
+    
+    console.log("AuthService: Calling repository signIn method");
     const result = await this.authRepository.signIn(credentials);
+    
     if (result.isErr()) {
+      const error = result.unwrapErr();
+      console.error("AuthService: Sign in failed:", {
+        kind: error.kind,
+        code: error.code,
+        message: error.message
+      });
+      
+      let errorMessage = "Authentication failed";
+      
+      if (error.message.includes("Invalid login credentials") || 
+          error.message.includes("Invalid email or password")) {
+        errorMessage = "Invalid email or password";
+      } else if (error.message.includes("Email not confirmed")) {
+        errorMessage = "Email not verified";
+      }
+      
+      console.log(`AuthService: Returning error to client: ${errorMessage}`);
+      
       return Result.Err(
-        ServiceError.validationFailed("Authentication failed", {
-          cause: result.unwrapErr(),
+        ServiceError.validationFailed(errorMessage, {
+          cause: error,
         }),
       );
     }
-    return Result.Ok(result.unwrap());
+    
+    const session = result.unwrap();
+    console.log("AuthService: Sign in successful:", {
+      userId: session?.user?.id,
+      hasSession: !!session,
+      expiresIn: session?.expiresAt ? `${Math.round((session.expiresAt - Date.now()/1000)/60)} minutes` : 'unknown'
+    });
+    
+    return Result.Ok(session);
   }
 
   async signUp(
@@ -203,58 +233,93 @@ export class AuthService implements IAuth<ServiceError> {
     return Result.Ok(void 0);
   }
 
-  getSession(): Promise<
-    Result<
-      {
-        accessToken: string;
-        refreshToken: string;
-        user: {
-          id: string;
-          email: string;
-          emailVerified: boolean;
-          metadata?:
-            | {
-                providers: string[];
-                appMetadata: Record<string, unknown>;
-                createdAt: string;
-                updatedAt: string;
-              }
-            | undefined;
-        };
-        expiresAt: number;
-      },
-      ServiceError
-    >
-  > {
-    throw new Error("Method not implemented.");
+
+  async getSession(): Promise<Result<AuthSession, ServiceError>> {
+    console.log("AuthService: Getting current session");
+    
+    const result = await this.authRepository.getSession();
+    
+    if (result.isErr()) {
+      const error = result.unwrapErr();
+      console.error("AuthService: Failed to get session:", error);
+      
+      return Result.Err(
+        ServiceError.unexpected("Failed to retrieve session", {
+          cause: error,
+        }),
+      );
+    }
+    
+    const session = result.unwrap();
+    console.log("AuthService: Session retrieved successfully");
+    
+    return Result.Ok(session);
   }
-  refreshSession(): Promise<
-    Result<
-      {
-        accessToken: string;
-        refreshToken: string;
-        user: {
-          id: string;
-          email: string;
-          emailVerified: boolean;
-          metadata?:
-            | {
-                providers: string[];
-                appMetadata: Record<string, unknown>;
-                createdAt: string;
-                updatedAt: string;
-              }
-            | undefined;
-        };
-        expiresAt: number;
-      },
-      ServiceError
-    >
-  > {
-    throw new Error("Method not implemented.");
+
+  async refreshSession(): Promise<Result<AuthSession, ServiceError>> {
+    console.log("AuthService: Refreshing session");
+    
+    const result = await this.authRepository.refreshSession();
+    
+    if (result.isErr()) {
+      const error = result.unwrapErr();
+      console.error("AuthService: Failed to refresh session:", error);
+      
+      return Result.Err(
+        ServiceError.unexpected("Failed to refresh session", {
+          cause: error,
+        }),
+      );
+    }
+    
+    const session = result.unwrap();
+    console.log("AuthService: Session refreshed successfully");
+    
+    return Result.Ok(session);
   }
-  isSessionValid(): Promise<boolean> {
-    throw new Error("Method not implemented.");
+
+  async isSessionValid(): Promise<boolean> {
+    try {
+      console.log("AuthService: Checking if session is valid");
+      
+      if (typeof this.authRepository.isSessionValid !== 'function') {
+        console.log("AuthService: Repository isSessionValid not implemented, falling back to getSession");
+        
+        const sessionResult = await this.authRepository.getSession();
+        if (sessionResult.isErr()) {
+          console.log("AuthService: No valid session found");
+          return false;
+        }
+        
+        const session = sessionResult.unwrap();
+        
+        if (!session) {
+          console.log("AuthService: Session is null");
+          return false;
+        }
+        
+        if (session.expiresAt) {
+          const now = Math.floor(Date.now() / 1000);
+          const isExpired = session.expiresAt < now;
+          
+          console.log("AuthService: Session expiration check:", {
+            expiresAt: session.expiresAt,
+            now: now,
+            isExpired: isExpired
+          });
+          
+          return !isExpired;
+        }
+        
+        return true;
+      }
+      
+      return await this.authRepository.isSessionValid();
+      
+    } catch (error) {
+      console.error("AuthService: Error checking session validity:", error);
+      return false;
+    }
   }
   getUser(): Promise<
     Result<
