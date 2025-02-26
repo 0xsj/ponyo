@@ -4,6 +4,7 @@
   "version": "1.0.0",
   "scripts": {
     "start": "expo start",
+    "start:local": "EXPO_PUBLIC_APP_VARIANT=local expo start",
     "start:dev": "EXPO_PUBLIC_APP_VARIANT=development expo start",
     "start:prod": "EXPO_PUBLIC_APP_VARIANT=production expo start",
     "android": "expo run:android",

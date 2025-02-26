@@ -6,6 +6,7 @@ import {
   AuthEventPayload,
   AuthSession,
   AuthUser,
+  EmailVerificationSubmit,
   OAuthProvider,
 } from "../domain/auth.entity";
 import { Result } from "@/lib/shared/result";
@@ -43,6 +44,26 @@ export class AuthQueries {
   }
   async signUp(credentials: AuthCredentials) {
     return this.authService.signUp(credentials);
+  }
+
+  async requestEmailVerification(
+    email: string,
+  ): Promise<Result<void, ServiceError>> {
+    return this.authService.requestEmailVerification(email);
+  }
+
+  async verifyEmail(
+    data: EmailVerificationSubmit,
+  ): Promise<Result<AuthSession, ServiceError>> {
+    const result = await this.authService.verifyEmail(data);
+
+    if (result.isOk()) {
+      const session = result.unwrap();
+      this.updateAuthCache(session);
+      await this.queryClient.invalidateQueries({ queryKey: authKeys.all });
+    }
+
+    return result;
   }
 
   async signOut(): Promise<Result<void, ServiceError>> {

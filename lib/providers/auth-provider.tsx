@@ -16,10 +16,9 @@ export function AuthProvider({ children }: PropsWithChildren) {
   useEffect(() => {
     const initAuth = async () => {
       try {
-        // Start both the auth check and the timer
         const [authResult] = await Promise.all([
           authClient.getSession(),
-          new Promise((resolve) => setTimeout(resolve, 1000)), // 3 second minimum
+          new Promise((resolve) => setTimeout(resolve, 1000)),
         ]);
 
         if (authResult.isOk()) {

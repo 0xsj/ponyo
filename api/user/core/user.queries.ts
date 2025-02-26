@@ -19,14 +19,28 @@ export class UserQueries {
     this.queryClient.setQueryData(userKeys.detail(user.id), user);
   }
 
-  async getUser(id: string): Promise<Result<User | null, ServiceError>> {
+  async getUser(
+    id: string,
+    forceRefresh = false,
+  ): Promise<Result<User | null, ServiceError>> {
+    console.log(
+      `UserQueries.getUser called for ID: ${id}, forceRefresh: ${forceRefresh}`,
+    );
+
+    if (forceRefresh) {
+      console.log(`Invalidating cache for user ID: ${id}`);
+      this.queryClient.invalidateQueries({ queryKey: userKeys.detail(id) });
+    }
+
     const result = await this.userService.getUser(id);
+
     if (result.isOk()) {
       const user = result.unwrap();
       if (user) {
         this.updateUserCache(user);
       }
     }
+
     return result;
   }
 }

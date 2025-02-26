@@ -1,4 +1,4 @@
-import { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { AuthNav } from "@/components/auth-nav";
 import { Box } from "@/components/ui/box";
 import { SafeAreaView } from "@/components/ui/safe-area-view";
@@ -8,23 +8,128 @@ import { router } from "expo-router";
 import { TextInput } from "@/components/ui/text-input";
 import { KeyboardAvoidingView, Platform } from "react-native";
 import { Icon } from "@/components/icon";
+import { useAuth } from "@/hooks/useAuth";
 
 export default function SignUpScreen() {
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const [verificationCode, setVerificationCode] = useState<string>("");
   const [error, setError] = useState<string | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
+  const [verificationSent, setVerificationSent] = useState(false);
+  const [countdown, setCountdown] = useState(60);
+  const [canResend, setCanResend] = useState(false);
+  const timerRef = useRef<NodeJS.Timeout | null>(null);
+
+  const { isLoading, signUp, verifyEmail, requestEmailVerification } =
+    useAuth();
+
+  useEffect(() => {
+    // Clean up timer on unmount
+    return () => {
+      if (timerRef.current) {
+        clearInterval(timerRef.current);
+      }
+    };
+  }, []);
+
+  // Handle countdown timer
+  useEffect(() => {
+    if (verificationSent && countdown > 0) {
+      timerRef.current = setInterval(() => {
+        setCountdown((prev) => {
+          if (prev <= 1) {
+            clearInterval(timerRef.current as NodeJS.Timeout);
+            setCanResend(true);
+            return 0;
+          }
+          return prev - 1;
+        });
+      }, 1000);
+    }
+
+    return () => {
+      if (timerRef.current) {
+        clearInterval(timerRef.current);
+      }
+    };
+  }, [verificationSent]);
 
   const handleSendVerification = async () => {
-    if (!email) return;
-    setIsLoading(true);
+    if (!email || !password) {
+      setError("Email and password are required");
+      return;
+    }
+
+    setError(null);
+
     try {
-      console.log("handle send verification");
+      const result = await requestEmailVerification(email);
+
+      if (result.isErr()) {
+        const err = result.unwrapErr();
+        setError(err.message);
+        return;
+      }
+
+      setCountdown(60);
+      setCanResend(false);
+      setVerificationSent(true);
     } catch (error) {
-      setError("womp womp");
-    } finally {
-      setIsLoading(false);
+      setError("An unexpected error occurred. Please try again.");
+      console.error(error);
+    }
+  };
+
+  const handleResendVerification = async () => {
+    if (!email) {
+      setError("Email is required");
+      return;
+    }
+
+    setError(null);
+
+    try {
+      const result = await requestEmailVerification(email);
+
+      if (result.isErr()) {
+        const err = result.unwrapErr();
+        setError(err.message);
+        return;
+      }
+
+      // Reset countdown and restart timer
+      setCountdown(60);
+      setCanResend(false);
+    } catch (error) {
+      setError("An unexpected error occurred. Please try again.");
+      console.error(error);
+    }
+  };
+
+  const handleVerifyAndCreateAccount = async () => {
+    if (!email || !password || !verificationCode) {
+      setError("Email, password, and verification code are required");
+      return;
+    }
+
+    setError(null);
+
+    try {
+      const verifyResult = await verifyEmail({
+        email,
+        code: verificationCode,
+      });
+
+      if (verifyResult.isErr()) {
+        const err = verifyResult.unwrapErr();
+        setError(err.message);
+        return;
+      }
+
+      router.replace("/(tabs)");
+    } catch (error) {
+      setError("An unexpected error occurred. Please try again.");
+      console.error(error);
     }
   };
 
@@ -46,6 +151,12 @@ export default function SignUpScreen() {
               Sign up
             </Text>
 
+            {error && (
+              <Box bg="error" p="sm" borderRadius="md" mb="md">
+                <Text color="foreground">{error}</Text>
+              </Box>
+            )}
+
             <Box style={{ position: "relative" }} mb="md">
               <TextInput
                 color="foreground"
@@ -58,18 +169,24 @@ export default function SignUpScreen() {
                 bg="surface"
                 p="md"
                 borderRadius="md"
+                editable={!verificationSent}
               />
-              <Touchable
-                style={{ position: "absolute", justifyContent: "center" }}
-                right={0}
-                top={0}
-                bottom={0}
-                px="md"
-                onPress={handleSendVerification}
-                disabled={!email || isLoading}
-              >
-                <Icon name="arrow-right-circle" color="muted" />
-              </Touchable>
+              {!verificationSent && (
+                <Touchable
+                  style={{ position: "absolute", justifyContent: "center" }}
+                  right={0}
+                  top={0}
+                  bottom={0}
+                  px="md"
+                  onPress={handleSendVerification}
+                  disabled={!email || isLoading}
+                >
+                  <Icon
+                    name="arrow-right-circle"
+                    color={!email || isLoading ? "muted" : "primary"}
+                  />
+                </Touchable>
+              )}
             </Box>
 
             <Box>
@@ -84,34 +201,75 @@ export default function SignUpScreen() {
                 p="md"
                 borderRadius="md"
                 mb="md"
+                editable={!verificationSent}
               />
             </Box>
 
-            <Box>
-              <TextInput
-                color="foreground"
-                value={verificationCode}
-                onChangeText={setVerificationCode}
-                placeholder="Enter verification code"
-                placeholderColor="muted"
-                keyboardType="number-pad"
-                bg="surface"
-                p="md"
-                borderRadius="md"
-              />
-            </Box>
+            {verificationSent && (
+              <>
+                <Box style={{ position: "relative" }} mb="md">
+                  <TextInput
+                    color="foreground"
+                    value={verificationCode}
+                    onChangeText={setVerificationCode}
+                    placeholder="Enter verification code"
+                    placeholderColor="muted"
+                    keyboardType="number-pad"
+                    bg="surface"
+                    p="md"
+                    borderRadius="md"
+                  />
+                </Box>
+
+                <Box flexDir="row" justify="space-between" align="center">
+                  <Text color="muted" fontSize="sm">
+                    We've sent a verification code to your email.
+                  </Text>
+
+                  {countdown > 0 ? (
+                    <Text color="primary" fontSize="sm">
+                      {countdown}s
+                    </Text>
+                  ) : (
+                    <Touchable
+                      onPress={handleResendVerification}
+                      disabled={isLoading || !canResend}
+                    >
+                      <Text
+                        color={canResend ? "primary" : "muted"}
+                        fontSize="sm"
+                      >
+                        Resend
+                      </Text>
+                    </Touchable>
+                  )}
+                </Box>
+              </>
+            )}
           </Box>
 
           <Touchable
-            onPress={() => {}}
-            disabled={isLoading}
+            onPress={
+              verificationSent
+                ? handleVerifyAndCreateAccount
+                : handleSendVerification
+            }
+            disabled={
+              isLoading ||
+              (!verificationSent && (!email || !password)) ||
+              (verificationSent && !verificationCode)
+            }
             bg="foreground"
             p="md"
             borderRadius="lg"
             mb={20}
           >
             <Text fontWeight="semibold" align="center" color="background">
-              Create account
+              {isLoading
+                ? "Please wait..."
+                : verificationSent
+                  ? "Verify & Create Account"
+                  : "Send Verification Code"}
             </Text>
           </Touchable>
         </Box>
