@@ -54,6 +54,10 @@ export class ServiceError extends ApplicationError<ServiceErrorKind> {
     return new ServiceError("forbidden", message, "FORBIDDEN", 403, context);
   }
 
+  static conflict(message: string, context?: Record<string, unknown>) {
+    return new ServiceError("conflict", message, "CONFLICT", 409, context);
+  }
+
   static serviceUnavailable(
     message: string,
     context?: Record<string, unknown>,

@@ -140,6 +140,8 @@ export class AuthRepository implements IAuth<RepositoryError> {
     credentials: AuthCredentials,
   ): Promise<Result<AuthSession, RepositoryError>> {
     try {
+      console.log("Starting signUp with:", { email: credentials.identifier });
+
       if (!credentials.identifier || !credentials.secret) {
         return Result.Err(
           RepositoryError.validationFailed(
@@ -148,6 +150,7 @@ export class AuthRepository implements IAuth<RepositoryError> {
         );
       }
 
+      // Sign up with Supabase - the email should already be verified at this point
       const { data, error } = await this.supabase.auth.signUp({
         email: credentials.identifier,
         password: credentials.secret,
@@ -156,25 +159,72 @@ export class AuthRepository implements IAuth<RepositoryError> {
         },
       });
 
+      console.log("Supabase signUp response:", {
+        hasData: !!data,
+        hasUser: !!data?.user,
+        hasSession: !!data?.session,
+        error: error ? error.message : null,
+      });
+
       if (error) {
         if (error.message.includes("already registered")) {
-          return Result.Err(RepositoryError.uniqueViolation("User", "email"));
+          console.log("User already registered, attempting sign in");
+
+          const signInResult = await this.signIn({
+            identifier: credentials.identifier,
+            secret: credentials.secret,
+          });
+
+          if (signInResult.isErr()) {
+            console.error("Sign in attempt failed:", signInResult.unwrapErr());
+            return Result.Err(RepositoryError.uniqueViolation("User", "email"));
+          }
+
+          return signInResult;
         }
+
         return Result.Err(
-          RepositoryError.queryFailed("Signup failed", { details: error }),
+          RepositoryError.queryFailed("Signup failed: " + error.message, {
+            details: error,
+          }),
         );
       }
 
-      await this.requestEmailVerification(credentials.identifier);
+      if (!data.session) {
+        console.error("No session returned after signup");
+        return Result.Err(
+          RepositoryError.invalidSession("No session returned after signup"),
+        );
+      }
 
       const sessionResult = AuthMapper.toAuthSession(data.session);
-      return this.handleSessionResult(sessionResult, "signup");
+      if (sessionResult.isErr()) {
+        return Result.Err(
+          RepositoryError.validationFailed("Failed to parse session", {
+            validation: sessionResult.unwrapErr(),
+          }),
+        );
+      }
+
+      const session = sessionResult.unwrap();
+      if (!session) {
+        return Result.Err(
+          RepositoryError.validationFailed("Session mapping returned null"),
+        );
+      }
+
+      return Result.Ok(session);
     } catch (error) {
+      console.error("Unexpected error in signUp:", error);
       return Result.Err(
-        RepositoryError.connectionFailed("Signup failed", { error }),
+        RepositoryError.connectionFailed(
+          "Signup failed due to unexpected error",
+          { error },
+        ),
       );
     }
   }
+
   async signOut(): Promise<Result<void, RepositoryError>> {
     try {
       const { error } = await this.supabase.auth.signOut();
@@ -199,21 +249,38 @@ export class AuthRepository implements IAuth<RepositoryError> {
     email: string,
   ): Promise<Result<void, RepositoryError>> {
     try {
-      const { error } = await this.supabase.auth.signInWithOtp({
+      console.log("Requesting email verification for local instance:", email);
+
+      // For local development, we'll use a different approach
+      // Sign up directly with a magic link instead of OTP
+      const { data, error } = await this.supabase.auth.signInWithOtp({
         email,
         options: {
           shouldCreateUser: true,
+          emailRedirectTo: "http://localhost:8081", // Adjust to your Expo app URL
         },
       });
+
+      console.log("Magic link request response:", {
+        hasData: !!data,
+        hasError: !!error,
+        errorDetails: error ? error.message : null,
+      });
+
       if (error) {
+        console.error("Error details from Supabase:", error);
         return Result.Err(
-          RepositoryError.queryFailed("Failed to send verification code", {
+          RepositoryError.queryFailed("Failed to send verification link", {
             details: error,
           }),
         );
       }
+
+      console.log("Verification link sent successfully");
       return Result.Ok(void 0);
     } catch (error) {
+      console.error("Exception in requestEmailVerification:", error);
+
       return Result.Err(
         RepositoryError.connectionFailed("Verification request failed", {
           error,
@@ -226,6 +293,11 @@ export class AuthRepository implements IAuth<RepositoryError> {
     data: EmailVerificationSubmit,
   ): Promise<Result<AuthSession, RepositoryError>> {
     try {
+      console.log("Verifying email with code:", {
+        email: data.email,
+        codeLength: data.code.length,
+      });
+
       const { data: authData, error } = await this.supabase.auth.verifyOtp({
         email: data.email,
         token: data.code,
@@ -244,6 +316,7 @@ export class AuthRepository implements IAuth<RepositoryError> {
       }
 
       if (!authData.session) {
+        console.error("No session returned after verification");
         return Result.Err(
           RepositoryError.queryFailed("No session returned after verification"),
         );

@@ -9,24 +9,12 @@ import { theme } from "@/theme/theme";
 import { Icon } from "@/components/icon";
 import { useUser } from "@/hooks/useUser";
 import { getUserStore } from "@/store/user.store";
+import { useDebugStorage } from "@/hooks/useDebugStore";
 
 export default function TabLayout() {
   const colorScheme = useColorScheme() ?? "light";
   const { getUser, currentUser, isLoading } = useUser();
   const store = getUserStore();
-
-  useEffect(() => {
-    const fetchUser = async () => {
-      const result = await getUser("52323019-384b-4673-a4ec-f17a995dc36e");
-      if (result.isOk()) {
-        store.getState().setCurrentUser(result.unwrap());
-      } else {
-        console.error("Failed to fetch user:", result.unwrapErr());
-      }
-    };
-
-    fetchUser();
-  }, []);
 
   return (
     <Tabs
