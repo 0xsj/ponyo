@@ -13,7 +13,7 @@ interface AuthState {
 
 interface AuthActions {
   setSession: (session: AuthSession | null) => void;
-  setUser: (user: AuthUser | null) =>  void;
+  setUser: (user: AuthUser | null) => void;
   setLoading: (loading: boolean) => void;
   reset: () => void;
 }
@@ -22,8 +22,8 @@ const initialState: AuthState = {
   session: null,
   user: null,
   isLoading: false,
-  isAuthenticated: false
-}
+  isAuthenticated: false,
+};
 
 export const useAuthStore = create<AuthState & AuthActions>()(
   persist(
@@ -50,7 +50,7 @@ export const useAuthStore = create<AuthState & AuthActions>()(
       },
     }),
     {
-      name: 'auth-storage',
-    }
-  )
+      name: "auth-storage",
+    },
+  ),
 );

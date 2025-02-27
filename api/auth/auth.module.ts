@@ -3,8 +3,8 @@ import { AuthRepository } from "./auth.repository";
 import { AuthService } from "./auth.service";
 
 export interface AuthModule {
-  repository: AuthRepository, 
-  service: AuthService
+  repository: AuthRepository;
+  service: AuthService;
 }
 
 export function createAuthModule(client: TypedSupabaseClient): AuthModule {
@@ -12,6 +12,6 @@ export function createAuthModule(client: TypedSupabaseClient): AuthModule {
   const service = new AuthService(repository);
   return {
     repository,
-    service
+    service,
   };
 }
