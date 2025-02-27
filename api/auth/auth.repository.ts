@@ -1,3 +1,4 @@
+//auth.repository.ts
 import { TypedSupabaseClient } from "@/lib/supabase/client/supabase-client";
 import { AuthSession, AuthCredentials } from "./auth.types";
 import { DataResult, DataError } from "@/lib/core/result";

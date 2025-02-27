@@ -13,7 +13,6 @@ export default function AuthLayout() {
           animation: "fade",
         }}
       />
-      {/* <Stack.Screen name="sign-up" /> */}
       <Stack.Screen
         name="login"
         options={{

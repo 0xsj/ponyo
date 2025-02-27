@@ -1,3 +1,4 @@
+//auth.service.ts
 import { AuthRepository } from "./auth.repository";
 import { AuthSession, AuthCredentials, authSessionSchema } from "./auth.types";
 import { ServiceResult, ServiceError } from "@/lib/core/result";

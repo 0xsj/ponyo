@@ -11,12 +11,7 @@ export default function HomeScreen() {
   // }
 
   const handleSignOut = async () => {
-    // const result = await signOut();
-    // if (result.isOk()) {
-    //   console.log("signing out");
-    // } else {
-    //   console.error("sign out failed", result.unwrapErr());
-    // }
+
   };
 
   return (
