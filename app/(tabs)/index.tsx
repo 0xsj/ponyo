@@ -10,9 +10,7 @@ export default function HomeScreen() {
   //   return null;
   // }
 
-  const handleSignOut = async () => {
-
-  };
+  const handleSignOut = async () => {};
 
   return (
     <Box flex={1} align="center" justify="center">

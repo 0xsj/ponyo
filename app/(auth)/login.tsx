@@ -1,7 +1,5 @@
 // app/(auth)/login.tsx
 import { useState } from "react";
-import { AuthCredentials } from "@/api/auth/domain/auth.entity";
-// import { useAuth } from "@/hooks/useAuth";
 import { TextInput } from "@/components/ui/text-input";
 import { Text } from "@/components/ui/text";
 import { SafeAreaView } from "@/components/ui/safe-area-view";
@@ -10,14 +8,39 @@ import { AuthNav } from "@/components/auth-nav";
 import { router } from "expo-router";
 import { Touchable } from "@/components/ui/touchable";
 import { KeyboardAvoidingView, Platform } from "react-native";
+import { useSignIn } from "@/api/auth/use-auth";
+import { useModules } from "@/lib/providers/app-provider";
 
 export default function Login() {
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const [error, setError] = useState<string | null>(null);
-  // const { signIn, isLoading } = useAuth();
+  const {auth} = useModules();
+  const signInMutation = useSignIn(auth.service);
 
-  const handleLogin = async () => {};
+  const handleLogin = async () => {
+    if(!email || !password) {
+      setError("email and password are required")
+      return;
+    }
+
+    try {
+      const result = await signInMutation.mutateAsync({
+        identifier: email,
+        secret: password
+      });
+
+      if(result.kind === 'error') {
+        setError(result.error.message);
+
+      } else {
+        setError(null)
+      }
+    } catch (error) {
+      setError("an unexpcated error has occured")
+      console.error(error)
+    }
+  };
 
   return (
     <SafeAreaView flex={1} bg="background">
@@ -71,7 +94,7 @@ export default function Login() {
             mb={20}
           >
             <Text fontWeight="semibold" align="center" color="background">
-              {/* {isLoading ? "Logging in..." : "Log in"} */}
+              {signInMutation.isPending ? "Logging in...": "Log in"}
             </Text>
           </Touchable>
         </Box>
