@@ -31,7 +31,7 @@ export const zustandStorage: StateStorage = {
       console.warn(`Failed to remove item '${name}' from storage:`, error);
       return Promise.resolve();
     }
-  }
+  },
 };
 
 export const storageHelper = {

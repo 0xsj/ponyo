@@ -15,32 +15,31 @@ export default function Login() {
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const [error, setError] = useState<string | null>(null);
-  const {auth} = useModules();
+  const { auth } = useModules();
   const signInMutation = useSignIn(auth.service);
 
   const handleLogin = async () => {
-    if(!email || !password) {
-      setError("email and password are required")
+    if (!email || !password) {
+      setError("email and password are required");
       return;
     }
 
     try {
       const result = await signInMutation.mutateAsync({
         identifier: email,
-        secret: password
+        secret: password,
       });
 
-      console.log(result)
+      console.log(result);
 
-      if(result.kind === 'error') {
+      if (result.kind === "error") {
         setError(result.error.message);
-
       } else {
-        setError(null)
+        setError(null);
       }
     } catch (error) {
-      setError("an unexpcated error has occured")
-      console.error(error)
+      setError("an unexpcated error has occured");
+      console.error(error);
     }
   };
 
@@ -95,7 +94,7 @@ export default function Login() {
             mb={20}
           >
             <Text fontWeight="semibold" align="center" color="background">
-              {signInMutation.isPending ? "Logging in...": "Log in"}
+              {signInMutation.isPending ? "Logging in..." : "Log in"}
             </Text>
           </Touchable>
         </Box>
