@@ -22,6 +22,7 @@ function AuthGuard({ children }: { children: React.ReactNode }) {
   const { session, isLoading } = useAuthStore();
 
   useEffect(() => {
+   
     const inAuthGroup = segments[0] === "(auth)";
     const inAppGroup = segments[0] === "(tabs)";
 

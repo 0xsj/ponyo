@@ -30,6 +30,8 @@ export default function Login() {
         secret: password
       });
 
+      console.log(result)
+
       if(result.kind === 'error') {
         setError(result.error.message);
 
@@ -87,7 +89,6 @@ export default function Login() {
           </Box>
           <Touchable
             onPress={handleLogin}
-            // disabled={isLoading}
             bg="foreground"
             p="md"
             borderRadius="lg"

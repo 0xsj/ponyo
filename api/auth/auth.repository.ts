@@ -15,6 +15,8 @@ export class AuthRepository {
       password: credentials.secret,
     });
 
+    console.log(credentials)
+
     if (error) {
       if (error.message.includes("Invalid login credentials")) {
         return {
