@@ -1,3 +1,4 @@
+//auth.repository.ts
 import { TypedSupabaseClient } from "@/lib/supabase/client/supabase-client";
 import { AuthSession, AuthCredentials } from "./auth.types";
 import { DataResult, DataError } from "@/lib/core/result";
@@ -13,6 +14,8 @@ export class AuthRepository {
       email: credentials.identifier,
       password: credentials.secret,
     });
+
+    console.log(credentials)
 
     if (error) {
       if (error.message.includes("Invalid login credentials")) {

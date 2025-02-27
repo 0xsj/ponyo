@@ -1,3 +1,4 @@
+//auth.module.ts
 import { TypedSupabaseClient } from "@/lib/supabase/client/supabase-client";
 import { AuthRepository } from "./auth.repository";
 import { AuthService } from "./auth.service";

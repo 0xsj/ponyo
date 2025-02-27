@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useRef } from "react";
 import { AuthNav } from "@/components/auth-nav";
 import { Box } from "@/components/ui/box";
 import { SafeAreaView } from "@/components/ui/safe-area-view";
@@ -8,7 +8,6 @@ import { router } from "expo-router";
 import { TextInput } from "@/components/ui/text-input";
 import { KeyboardAvoidingView, Platform } from "react-native";
 import { Icon } from "@/components/icon";
-// import { useAuth } from "@/hooks/useAuth";
 
 export default function SignUpScreen() {
   const [email, setEmail] = useState<string>("");
@@ -18,109 +17,19 @@ export default function SignUpScreen() {
   const [verificationSent, setVerificationSent] = useState(false);
   const [countdown, setCountdown] = useState(60);
   const [canResend, setCanResend] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
 
-  useEffect(() => {
-    return () => {
-      if (timerRef.current) {
-        clearInterval(timerRef.current);
-      }
-    };
-  }, []);
-
-  useEffect(() => {
-    if (verificationSent && countdown > 0) {
-      timerRef.current = setInterval(() => {
-        setCountdown((prev) => {
-          if (prev <= 1) {
-            clearInterval(timerRef.current as NodeJS.Timeout);
-            setCanResend(true);
-            return 0;
-          }
-          return prev - 1;
-        });
-      }, 1000);
-    }
-
-    return () => {
-      if (timerRef.current) {
-        clearInterval(timerRef.current);
-      }
-    };
-  }, [verificationSent]);
-
-  const handleSendVerification = async () => {
-    // if (!email || !password) {
-    //   setError("Email and password are required");
-    //   return;
-    // }
-    // setError(null);
-    // try {
-    //   const result = await requestEmailVerification(email, password);
-    //   if (result.isErr()) {
-    //     const err = result.unwrapErr();
-    //     setError(err.message);
-    //     return;
-    //   }
-    //   setCountdown(60);
-    //   setCanResend(false);
-    //   setVerificationSent(true);
-    // } catch (error) {
-    //   setError("An unexpected error occurred. Please try again.");
-    //   console.error(error);
-    // }
+  const handleSendVerification = () => {
+    // Implementation will go here
   };
 
-  const handleResendVerification = async () => {
-    if (!email || !password) {
-      setError("Email and password are required");
-      return;
-    }
-
-    setError(null);
-
-    // try {
-    //   const result = await requestEmailVerification(email, password);
-
-    //   if (result.isErr()) {
-    //     const err = result.unwrapErr();
-    //     setError(err.message);
-    //     return;
-    //   }
-
-    //   setCountdown(60);
-    //   setCanResend(false);
-    // } catch (error) {
-    //   setError("An unexpected error occurred. Please try again.");
-    //   console.error(error);
-    // }
+  const handleResendVerification = () => {
+    // Implementation will go here
   };
 
-  const handleVerifyAndCreateAccount = async () => {
-    if (!email || !password || !verificationCode) {
-      setError("Email, password, and verification code are required");
-      return;
-    }
-
-    setError(null);
-
-    // try {
-    //   const verifyResult = await verifyEmail({
-    //     email,
-    //     code: verificationCode,
-    //   });
-
-    //   if (verifyResult.isErr()) {
-    //     const err = verifyResult.unwrapErr();
-    //     setError(err.message);
-    //     return;
-    //   }
-
-    //   router.replace("/(tabs)");
-    // } catch (error) {
-    //   setError("An unexpected error occurred. Please try again.");
-    //   console.error(error);
-    // }
+  const handleVerifyAndCreateAccount = () => {
+    // Implementation will go here
   };
 
   return (

@@ -1,3 +1,4 @@
+//auth.types.ts
 import { z } from "zod";
 import { SupabaseAuthSession, SupabaseAuthUser } from "@/lib/supabase";
 

@@ -10,14 +10,7 @@ export default function HomeScreen() {
   //   return null;
   // }
 
-  const handleSignOut = async () => {
-    // const result = await signOut();
-    // if (result.isOk()) {
-    //   console.log("signing out");
-    // } else {
-    //   console.error("sign out failed", result.unwrapErr());
-    // }
-  };
+  const handleSignOut = async () => {};
 
   return (
     <Box flex={1} align="center" justify="center">
