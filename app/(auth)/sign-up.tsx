@@ -8,7 +8,7 @@ import { router } from "expo-router";
 import { TextInput } from "@/components/ui/text-input";
 import { KeyboardAvoidingView, Platform } from "react-native";
 import { Icon } from "@/components/icon";
-import { useAuth } from "@/hooks/useAuth";
+// import { useAuth } from "@/hooks/useAuth";
 
 export default function SignUpScreen() {
   const [email, setEmail] = useState<string>("");
@@ -20,11 +20,7 @@ export default function SignUpScreen() {
   const [canResend, setCanResend] = useState(false);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
 
-  const { isLoading, signUp, verifyEmail, requestEmailVerification } =
-    useAuth();
-
   useEffect(() => {
-    // Clean up timer on unmount
     return () => {
       if (timerRef.current) {
         clearInterval(timerRef.current);
@@ -32,7 +28,6 @@ export default function SignUpScreen() {
     };
   }, []);
 
-  // Handle countdown timer
   useEffect(() => {
     if (verificationSent && countdown > 0) {
       timerRef.current = setInterval(() => {
@@ -55,6 +50,28 @@ export default function SignUpScreen() {
   }, [verificationSent]);
 
   const handleSendVerification = async () => {
+    // if (!email || !password) {
+    //   setError("Email and password are required");
+    //   return;
+    // }
+    // setError(null);
+    // try {
+    //   const result = await requestEmailVerification(email, password);
+    //   if (result.isErr()) {
+    //     const err = result.unwrapErr();
+    //     setError(err.message);
+    //     return;
+    //   }
+    //   setCountdown(60);
+    //   setCanResend(false);
+    //   setVerificationSent(true);
+    // } catch (error) {
+    //   setError("An unexpected error occurred. Please try again.");
+    //   console.error(error);
+    // }
+  };
+
+  const handleResendVerification = async () => {
     if (!email || !password) {
       setError("Email and password are required");
       return;
@@ -62,48 +79,21 @@ export default function SignUpScreen() {
 
     setError(null);
 
-    try {
-      const result = await requestEmailVerification(email);
+    // try {
+    //   const result = await requestEmailVerification(email, password);
 
-      if (result.isErr()) {
-        const err = result.unwrapErr();
-        setError(err.message);
-        return;
-      }
+    //   if (result.isErr()) {
+    //     const err = result.unwrapErr();
+    //     setError(err.message);
+    //     return;
+    //   }
 
-      setCountdown(60);
-      setCanResend(false);
-      setVerificationSent(true);
-    } catch (error) {
-      setError("An unexpected error occurred. Please try again.");
-      console.error(error);
-    }
-  };
-
-  const handleResendVerification = async () => {
-    if (!email) {
-      setError("Email is required");
-      return;
-    }
-
-    setError(null);
-
-    try {
-      const result = await requestEmailVerification(email);
-
-      if (result.isErr()) {
-        const err = result.unwrapErr();
-        setError(err.message);
-        return;
-      }
-
-      // Reset countdown and restart timer
-      setCountdown(60);
-      setCanResend(false);
-    } catch (error) {
-      setError("An unexpected error occurred. Please try again.");
-      console.error(error);
-    }
+    //   setCountdown(60);
+    //   setCanResend(false);
+    // } catch (error) {
+    //   setError("An unexpected error occurred. Please try again.");
+    //   console.error(error);
+    // }
   };
 
   const handleVerifyAndCreateAccount = async () => {
@@ -114,23 +104,23 @@ export default function SignUpScreen() {
 
     setError(null);
 
-    try {
-      const verifyResult = await verifyEmail({
-        email,
-        code: verificationCode,
-      });
+    // try {
+    //   const verifyResult = await verifyEmail({
+    //     email,
+    //     code: verificationCode,
+    //   });
 
-      if (verifyResult.isErr()) {
-        const err = verifyResult.unwrapErr();
-        setError(err.message);
-        return;
-      }
+    //   if (verifyResult.isErr()) {
+    //     const err = verifyResult.unwrapErr();
+    //     setError(err.message);
+    //     return;
+    //   }
 
-      router.replace("/(tabs)");
-    } catch (error) {
-      setError("An unexpected error occurred. Please try again.");
-      console.error(error);
-    }
+    //   router.replace("/(tabs)");
+    // } catch (error) {
+    //   setError("An unexpected error occurred. Please try again.");
+    //   console.error(error);
+    // }
   };
 
   return (
@@ -223,7 +213,7 @@ export default function SignUpScreen() {
 
                 <Box flexDir="row" justify="space-between" align="center">
                   <Text color="muted" fontSize="sm">
-                    We've sent a verification code to your email.
+                    Check database for your verification code.
                   </Text>
 
                   {countdown > 0 ? (

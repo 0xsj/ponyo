@@ -76,3 +76,18 @@ export function transformToSnakeCase<T extends Record<string, any>>(
 ): CamelToSnakeCase<T> {
   return transformKeys(data, camelToSnake) as CamelToSnakeCase<T>;
 }
+
+export function serializeErr(error: unknown, meta?: Record<string, any>) {
+  if (error instanceof Error) {
+    return {
+      error: {
+        name: error.name,
+        message: error.message,
+        stack: error.stack,
+      },
+      meta,
+    };
+  }
+
+  return { error, meta };
+}
