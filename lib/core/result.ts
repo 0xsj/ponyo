@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 
 export type DataErrorKind = "not_found" | "invalid" | "query" | "connection";
