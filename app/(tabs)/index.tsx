@@ -1,16 +1,15 @@
-// import { useAuth } from "@/hooks/useAuth";
 import { Box } from "@/components/ui/box";
 import { Text } from "@/components/ui/text";
 import { Touchable } from "@/components/ui/touchable";
+import { useModules } from "@/lib/providers/app-provider";
+import { useSignOut } from "@/api/auth/use-auth";
 
 export default function HomeScreen() {
-  // const { session, signOut, isLoading } = useAuth();
-
-  // if (isLoading || !session) {
-  //   return null;
-  // }
-
-  const handleSignOut = async () => {};
+  const { auth } = useModules();
+  const signOutMutation = useSignOut(auth.service);
+  const handleSignOut = async () => {
+    signOutMutation.mutate();
+  };
 
   return (
     <Box flex={1} align="center" justify="center">

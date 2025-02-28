@@ -27,3 +27,26 @@ export function useSignIn(authService: AuthService) {
     },
   });
 }
+
+export function useSignOut(authService: AuthService) {
+  const queryClient = useQueryClient();
+  const reset = useAuthStore((state) => state.reset);
+  const setLoading = useAuthStore((state) => state.setLoading);
+
+  return useMutation({
+    mutationFn: async () => {
+      setLoading(true);
+      try {
+        return await authService.signOut();
+      } finally {
+        setLoading(false);
+      }
+    },
+    onSuccess: (result) => {
+      if (result.kind === "success") {
+        reset();
+        queryClient.clear();
+      }
+    },
+  });
+}

@@ -1,3 +1,5 @@
+import { DataError, ServiceError } from "../core/result";
+
 type CamelCase<S extends string> =
   S extends `${infer P1}_${infer P2}${infer P3}`
     ? `${P1}${Uppercase<P2>}${CamelCase<P3>}`
@@ -77,17 +79,39 @@ export function transformToSnakeCase<T extends Record<string, any>>(
   return transformKeys(data, camelToSnake) as CamelToSnakeCase<T>;
 }
 
-export function serializeErr(error: unknown, meta?: Record<string, any>) {
-  if (error instanceof Error) {
-    return {
-      error: {
-        name: error.name,
-        message: error.message,
-        stack: error.stack,
-      },
-      meta,
-    };
-  }
+export function serializeErr(
+  error: unknown,
+  meta?: Record<string, unknown>,
+): Record<string, unknown> {
+  const serialize = (err: unknown): Record<string, unknown> => {
+    if (err instanceof DataError || err instanceof ServiceError) {
+      const errorJson = err.toJSON() as Record<string, unknown>;
+      return {
+        ...errorJson,
+        source: err.source ? serialize(err.source) : undefined,
+      };
+    }
 
-  return { error, meta };
+    if (err instanceof Error) {
+      const serialized: Record<string, unknown> = {
+        name: err.name,
+        message: err.message,
+        stack: err.stack,
+      };
+
+      if (err.cause) {
+        serialized.cause = serialize(err.cause);
+      }
+
+      return serialized;
+    }
+
+    return { value: err };
+  };
+
+  return {
+    error: serialize(error),
+    meta,
+    timestamp: new Date().toISOString(),
+  };
 }

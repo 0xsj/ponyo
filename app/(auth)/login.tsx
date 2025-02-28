@@ -30,8 +30,6 @@ export default function Login() {
         secret: password,
       });
 
-      console.log(result);
-
       if (result.kind === "error") {
         setError(result.error.message);
       } else {
