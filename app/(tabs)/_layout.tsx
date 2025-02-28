@@ -7,7 +7,6 @@ import TabBarBackground from "@/components/ui/TabBarBackground";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { theme } from "@/theme/theme";
 import { Icon } from "@/components/icon";
-import { useDebugStorage } from "@/hooks/useDebugStore";
 
 export default function TabLayout() {
   const colorScheme = useColorScheme() ?? "light";
@@ -59,7 +58,7 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
-        name="chat/index"
+        name="chat"
         options={{
           title: "Chat",
           tabBarShowLabel: false,
@@ -73,7 +72,7 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
-        name="profile/index"
+        name="profile"
         options={{
           title: "Profile",
           tabBarShowLabel: false,
