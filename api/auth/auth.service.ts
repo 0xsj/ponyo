@@ -1,10 +1,20 @@
-//auth.service.ts
 import { AuthRepository } from "./auth.repository";
-import { AuthSession, AuthCredentials, authSessionSchema } from "./auth.types";
-import { ServiceResult, ServiceError } from "@/lib/core/result";
+import {
+  AuthSession,
+  AuthCredentials,
+  authSessionSchema,
+  authCredentialSchema,
+} from "./auth.types";
+import {
+  ServiceError,
+  ServiceResult,
+  chain,
+  DataError,
+} from "@/lib/core/result";
 
 export class AuthService {
   private readonly authRepository: AuthRepository;
+
   constructor(authRepository: AuthRepository) {
     this.authRepository = authRepository;
   }
@@ -12,46 +22,39 @@ export class AuthService {
   async signIn(
     credentials: AuthCredentials,
   ): Promise<ServiceResult<AuthSession>> {
-    if (!credentials.identifier || !credentials.secret) {
-      return {
+    const credentialsValidation = authCredentialSchema.safeParse(credentials);
+    if (!credentialsValidation.success) {
+      return chain<AuthSession, ServiceError>({
         kind: "error",
-        error: ServiceError.validation("Email and password are required"),
-      };
-    }
-
-    const result = await this.authRepository.signIn(credentials);
-
-    if (result.kind === "error") {
-      switch (result.error.kind) {
-        case "invalid":
-          return {
-            kind: "error",
-            error: ServiceError.validation(result.error.message),
-          };
-        case "query":
-          return {
-            kind: "error",
-            error: ServiceError.unexpected(
-              result.error.message,
-              result.error.context,
-            ),
-          };
-        default:
-          return {
-            kind: "error",
-            error: ServiceError.unexpected("Authentication failed"),
-          };
-      }
-    }
-    const validationResult = authSessionSchema.safeParse(result.data);
-    if (!validationResult.success) {
-      return {
-        kind: "error",
-        error: ServiceError.validation("Invalid session data", {
-          cause: validationResult.error,
+        error: ServiceError.validation("Invalid credentials", {
+          context: { validationErrors: credentialsValidation.error.format() },
         }),
-      };
+      })
+        .log({ operation: "signIn.validation" })
+        .toServiceResult();
     }
-    return { kind: "success", data: validationResult.data };
+
+    const result = await this.authRepository.signIn(credentialsValidation.data);
+
+    return chain<AuthSession, DataError>(result)
+      .mapErr({
+        invalid: "auth",
+        query: "unexpected",
+      })
+      .log({
+        operation: "signIn",
+        identifier: credentials.identifier,
+      })
+      .validate(authSessionSchema, "Invalid session data")
+      .toServiceResult();
+  }
+
+  async signOut(): Promise<ServiceResult<void>> {
+    const result = await this.authRepository.signOut();
+
+    return chain<void, DataError>(result)
+      .mapErr(undefined, "Failed to sign out")
+      .log({ operation: "signOut" })
+      .toServiceResult();
   }
 }

@@ -7,14 +7,10 @@ import TabBarBackground from "@/components/ui/TabBarBackground";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { theme } from "@/theme/theme";
 import { Icon } from "@/components/icon";
-import { getUserStore } from "@/store/user.store";
 import { useDebugStorage } from "@/hooks/useDebugStore";
 
 export default function TabLayout() {
   const colorScheme = useColorScheme() ?? "light";
-  const store = getUserStore();
-
-  useDebugStorage();
 
   return (
     <Tabs

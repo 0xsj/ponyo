@@ -1,8 +1,5 @@
 import { createAuthModule } from "@/api/auth/auth.module";
-import {
-  supabase,
-  TypedSupabaseClient,
-} from "../supabase/client/supabase-client";
+import { supabase } from "../supabase/client/supabase-client";
 import React, { createContext, PropsWithChildren, useContext } from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
